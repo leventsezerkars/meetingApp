@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ToplantiApp.API/ToplantiApp.API.csproj" />
+    <Project Path="src/ToplantiApp.Application/ToplantiApp.Application.csproj" />
+    <Project Path="src/ToplantiApp.Domain/ToplantiApp.Domain.csproj" />
+    <Project Path="src/ToplantiApp.Infrastructure/ToplantiApp.Infrastructure.csproj" />
+  </Folder>
+</Solution>
