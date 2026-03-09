@@ -1,0 +1,53 @@
+# .NET
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.cache
+*.vs/
+.vs/
+*.nupkg
+project.lock.json
+*.nuget.props
+*.nuget.targets
+TestResults/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# User-specific files
+appsettings.Development.json
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+.sass-cache/
+npm-debug.log
+yarn-error.log
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Uploads
+wwwroot/uploads/
+
+# Docker
+.dockerignore.bak
+
+# Misc
+*.log
