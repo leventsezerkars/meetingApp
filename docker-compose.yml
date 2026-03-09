@@ -1,0 +1,29 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=TopLanTi2024!Str0ng
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  api:
+    build: .
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=ToplantiCaseDb;User Id=sa;Password=TopLanTi2024!Str0ng;TrustServerCertificate=True;
+      - Jwt__Key=ToplantiCaseAppSuperSecretKeyForJwtToken2024!
+      - Jwt__Issuer=ToplantiApp
+      - Jwt__Audience=ToplantiApp
+      - Jwt__ExpireHours=24
+      - App__FrontendUrl=http://localhost:5000
+    depends_on:
+      - mssql
+
+volumes:
+  mssql_data:
