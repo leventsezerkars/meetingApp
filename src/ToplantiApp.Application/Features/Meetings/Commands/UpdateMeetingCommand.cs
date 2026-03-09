@@ -1,0 +1,50 @@
+using AutoMapper;
+using FluentValidation;
+using MediatR;
+using ToplantiApp.Application.Common.Exceptions;
+using ToplantiApp.Application.DTOs;
+using ToplantiApp.Domain.Interfaces;
+
+namespace ToplantiApp.Application.Features.Meetings.Commands;
+
+public record UpdateMeetingCommand(int Id, UpdateMeetingDto Data, int UserId) : IRequest<MeetingDto>;
+
+public class UpdateMeetingCommandValidator : AbstractValidator<UpdateMeetingCommand>
+{
+    public UpdateMeetingCommandValidator()
+    {
+        RuleFor(x => x.Data.Name).NotEmpty().MaximumLength(250);
+        RuleFor(x => x.Data.EndDate).GreaterThan(x => x.Data.StartDate);
+    }
+}
+
+public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand, MeetingDto>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public UpdateMeetingCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+
+    public async Task<MeetingDto> Handle(UpdateMeetingCommand request, CancellationToken cancellationToken)
+    {
+        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(request.Id)
+            ?? throw new NotFoundException("Toplanti", request.Id);
+
+        if (meeting.CreatedByUserId != request.UserId)
+            throw new ForbiddenException("Bu toplantiyi duzenleme yetkiniz yok.");
+
+        meeting.Name = request.Data.Name;
+        meeting.Description = request.Data.Description;
+        meeting.StartDate = request.Data.StartDate;
+        meeting.EndDate = request.Data.EndDate;
+
+        _unitOfWork.Meetings.Update(meeting);
+        await _unitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<MeetingDto>(meeting);
+    }
+}
