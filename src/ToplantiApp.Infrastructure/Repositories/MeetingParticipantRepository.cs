@@ -11,12 +11,12 @@ public class MeetingParticipantRepository : GenericRepository<MeetingParticipant
     {
     }
 
-    public async Task<IReadOnlyList<MeetingParticipant>> GetByMeetingIdAsync(int meetingId)
-        => await _dbSet
+    public async Task<List<MeetingParticipant>> GetByMeetingIdAsync(int meetingId)
+        => await Query
             .Include(mp => mp.User)
             .Where(mp => mp.MeetingId == meetingId)
             .ToListAsync();
 
     public async Task<bool> IsParticipantAsync(int meetingId, string email)
-        => await _dbSet.AnyAsync(mp => mp.MeetingId == meetingId && mp.Email == email);
+        => await Query.AnyAsync(mp => mp.MeetingId == meetingId && mp.Email == email);
 }

@@ -9,7 +9,7 @@ namespace ToplantiApp.Infrastructure.Repositories;
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
     protected readonly AppDbContext _context;
-    protected readonly DbSet<T> _dbSet;
+    private readonly DbSet<T> _dbSet;
 
     public GenericRepository(AppDbContext context)
     {
@@ -17,13 +17,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         _dbSet = context.Set<T>();
     }
 
+    public IQueryable<T> Query => _dbSet.AsQueryable();
+
     public async Task<T?> GetByIdAsync(int id)
         => await _dbSet.FindAsync(id);
 
-    public async Task<IReadOnlyList<T>> GetAllAsync()
+    public async Task<List<T>> GetAllAsync()
         => await _dbSet.ToListAsync();
 
-    public async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
         => await _dbSet.Where(predicate).ToListAsync();
 
     public async Task<T> AddAsync(T entity)

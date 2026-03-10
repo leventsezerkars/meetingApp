@@ -12,15 +12,15 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     }
 
     public async Task<User?> GetByEmailAsync(string email)
-        => await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
+        => await Query.FirstOrDefaultAsync(u => u.Email == email);
 
     public async Task<bool> EmailExistsAsync(string email)
-        => await _dbSet.AnyAsync(u => u.Email == email);
+        => await Query.AnyAsync(u => u.Email == email);
 
-    public async Task<IReadOnlyList<User>> SearchUsersAsync(string searchTerm)
+    public async Task<List<User>> SearchUsersAsync(string searchTerm)
     {
         var term = searchTerm.ToLower();
-        return await _dbSet
+        return await Query
             .Where(u => u.FirstName.ToLower().Contains(term)
                      || u.LastName.ToLower().Contains(term)
                      || u.Email.ToLower().Contains(term))
