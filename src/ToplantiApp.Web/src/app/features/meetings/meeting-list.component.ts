@@ -10,25 +10,25 @@ import { MeetingListDto } from '../../core/models/meeting.model';
   imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Toplantilar</h2>
-      <a routerLink="/meetings/create" class="btn btn-primary">+ Yeni Toplanti</a>
+      <h2>Toplantılar</h2>
+      <a routerLink="/meetings/create" class="btn btn-primary">+ Yeni Toplantı</a>
     </div>
 
     <div class="mb-3">
-      <input type="text" class="form-control" placeholder="Toplanti ara..." [(ngModel)]="searchTerm">
+      <input type="text" class="form-control" placeholder="Toplantı ara..." [(ngModel)]="searchTerm">
     </div>
 
     <div class="table-responsive">
       <table class="table table-hover">
         <thead class="table-light">
           <tr>
-            <th>Toplanti Adi</th>
-            <th>Baslangic</th>
-            <th>Bitis</th>
+            <th>Toplantı Adı</th>
+            <th>Başlangıç</th>
+            <th>Bitiş</th>
             <th>Durum</th>
-            <th>Katilimci</th>
-            <th>Olusturan</th>
-            <th>Islemler</th>
+            <th>Katılımcı</th>
+            <th>Oluşturan</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
@@ -39,7 +39,7 @@ import { MeetingListDto } from '../../core/models/meeting.model';
               <td>{{ m.endDate | date:'dd.MM.yyyy HH:mm' }}</td>
               <td>
                 <span [class]="m.status === 'Active' ? 'badge bg-success' : 'badge bg-danger'">
-                  {{ m.status === 'Active' ? 'Aktif' : 'Iptal' }}
+                  {{ m.status === 'Active' ? 'Aktif' : 'İptal' }}
                 </span>
               </td>
               <td>{{ m.participantCount }}</td>
@@ -47,7 +47,7 @@ import { MeetingListDto } from '../../core/models/meeting.model';
               <td>
                 <a [routerLink]="['/meetings', m.id]" class="btn btn-sm btn-outline-primary me-1">Detay</a>
                 @if (m.status === 'Active') {
-                  <a [routerLink]="['/meetings', m.id, 'edit']" class="btn btn-sm btn-outline-secondary">Duzenle</a>
+                  <a [routerLink]="['/meetings', m.id, 'edit']" class="btn btn-sm btn-outline-secondary">Düzenle</a>
                 }
               </td>
             </tr>
@@ -58,8 +58,8 @@ import { MeetingListDto } from '../../core/models/meeting.model';
 
     @if (meetings.length === 0) {
       <div class="text-center text-muted py-5">
-        <p>Henuz toplanti bulunmuyor.</p>
-        <a routerLink="/meetings/create" class="btn btn-primary">Ilk Toplantinizi Olusturun</a>
+        <p>Henüz toplantı bulunmuyor.</p>
+        <a routerLink="/meetings/create" class="btn btn-primary">İlk Toplantınızı Oluşturun</a>
       </div>
     }
   `

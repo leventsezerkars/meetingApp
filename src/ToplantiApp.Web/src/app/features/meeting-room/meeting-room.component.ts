@@ -11,7 +11,7 @@ import { MeetingAccessResult } from '../../core/models/meeting.model';
     @if (loading) {
       <div class="text-center py-5">
         <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2">Toplanti bilgileri yukleniyor...</p>
+        <p class="mt-2">Toplantı bilgileri yükleniyor...</p>
       </div>
     }
 
@@ -22,7 +22,7 @@ import { MeetingAccessResult } from '../../core/models/meeting.model';
             <div class="card shadow border-danger">
               <div class="card-body text-center p-5">
                 <h1 class="display-1 text-danger">⛔</h1>
-                <h3 class="text-danger">Erisim Engellendi</h3>
+                <h3 class="text-danger">Erişim Engellendi</h3>
                 <p class="text-muted mt-3">{{ result.message }}</p>
               </div>
             </div>
@@ -32,21 +32,21 @@ import { MeetingAccessResult } from '../../core/models/meeting.model';
         <div class="card shadow">
           <div class="card-header bg-success text-white">
             <h3 class="mb-0">{{ result.meeting.name }}</h3>
-            <small>Organizator: {{ result.meeting.createdByName }}</small>
+            <small>Organizatör: {{ result.meeting.createdByName }}</small>
           </div>
           <div class="card-body">
             <div class="row mb-4">
               <div class="col-md-6">
-                <p><strong>Baslangic:</strong> {{ result.meeting.startDate | date:'dd.MM.yyyy HH:mm' }}</p>
-                <p><strong>Bitis:</strong> {{ result.meeting.endDate | date:'dd.MM.yyyy HH:mm' }}</p>
+                <p><strong>Başlangıç:</strong> {{ result.meeting.startDate | date:'dd.MM.yyyy HH:mm' }}</p>
+                <p><strong>Bitiş:</strong> {{ result.meeting.endDate | date:'dd.MM.yyyy HH:mm' }}</p>
               </div>
               <div class="col-md-6">
-                <p><strong>Aciklama:</strong> {{ result.meeting.description || '-' }}</p>
+                <p><strong>Açıklama:</strong> {{ result.meeting.description || '-' }}</p>
                 <p><strong>Durum:</strong> <span class="badge bg-success">Devam Ediyor</span></p>
               </div>
             </div>
 
-            <h5>Katilimcilar</h5>
+            <h5>Katılımcılar</h5>
             <ul class="list-group mb-4">
               @for (p of result.meeting.participants; track p.id) {
                 <li class="list-group-item d-flex justify-content-between">
@@ -57,7 +57,7 @@ import { MeetingAccessResult } from '../../core/models/meeting.model';
             </ul>
 
             @if (result.meeting.documents.length > 0) {
-              <h5>Dokumanlar</h5>
+              <h5>Dokümanlar</h5>
               <ul class="list-group">
                 @for (doc of result.meeting.documents; track doc.id) {
                   <li class="list-group-item">{{ doc.originalFileName }}</li>
@@ -93,7 +93,7 @@ export class MeetingRoomComponent implements OnInit {
         if (err.error?.data) {
           this.result = err.error.data;
         } else {
-          this.errorMsg = err.error?.message || 'Toplanti bulunamadi veya bir hata olustu.';
+          this.errorMsg = err.error?.message || 'Toplantı bulunamadı veya bir hata oluştu.';
         }
         this.loading = false;
       }

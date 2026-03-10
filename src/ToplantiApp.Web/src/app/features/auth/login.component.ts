@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="col-md-5">
         <div class="card shadow">
           <div class="card-body p-4">
-            <h3 class="text-center mb-4">Giris Yap</h3>
+            <h3 class="text-center mb-4">Giriş Yap</h3>
             @if (error) {
               <div class="alert alert-danger">{{ error }}</div>
             }
@@ -22,15 +22,15 @@ import { AuthService } from '../../core/services/auth.service';
                 <input type="email" class="form-control" [(ngModel)]="email" name="email" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">Sifre</label>
+                <label class="form-label">Şifre</label>
                 <input type="password" class="form-control" [(ngModel)]="password" name="password" required>
               </div>
               <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
-                {{ loading ? 'Giris yapiliyor...' : 'Giris Yap' }}
+                {{ loading ? 'Giriş yapılıyor...' : 'Giriş Yap' }}
               </button>
             </form>
             <p class="text-center mt-3">
-              Hesabiniz yok mu? <a routerLink="/register">Kayit Ol</a>
+              Hesabınız yok mu? <a routerLink="/register">Kayıt Ol</a>
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/meetings']);
       },
       error: (err) => {
-        this.error = err.error?.message || 'Giris basarisiz.';
+        this.error = err.error?.message || 'Giriş başarısız.';
         this.loading = false;
       }
     });

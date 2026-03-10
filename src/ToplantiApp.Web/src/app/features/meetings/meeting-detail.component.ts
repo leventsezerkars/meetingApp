@@ -15,8 +15,8 @@ import { UserDto } from '../../core/models/auth.model';
         <h2>{{ meeting.name }}</h2>
         <div class="d-flex gap-2">
           @if (meeting.status === 'Active') {
-            <a [routerLink]="['/meetings', meeting.id, 'edit']" class="btn btn-outline-primary">Duzenle</a>
-            <button class="btn btn-outline-danger" (click)="cancelMeeting()">Iptal Et</button>
+            <a [routerLink]="['/meetings', meeting.id, 'edit']" class="btn btn-outline-primary">Düzenle</a>
+            <button class="btn btn-outline-danger" (click)="cancelMeeting()">İptal Et</button>
           }
           <a routerLink="/meetings" class="btn btn-secondary">Geri</a>
         </div>
@@ -26,29 +26,29 @@ import { UserDto } from '../../core/models/auth.model';
         <div class="col-md-8">
           <div class="card shadow mb-4">
             <div class="card-body">
-              <h5 class="card-title">Toplanti Bilgileri</h5>
+              <h5 class="card-title">Toplantı Bilgileri</h5>
               <div class="row mb-2">
                 <div class="col-4 fw-bold">Durum:</div>
                 <div class="col-8">
                   <span [class]="meeting.status === 'Active' ? 'badge bg-success' : 'badge bg-danger'">
-                    {{ meeting.status === 'Active' ? 'Aktif' : 'Iptal' }}
+                    {{ meeting.status === 'Active' ? 'Aktif' : 'İptal' }}
                   </span>
                 </div>
               </div>
               <div class="row mb-2">
-                <div class="col-4 fw-bold">Baslangic:</div>
+                <div class="col-4 fw-bold">Başlangıç:</div>
                 <div class="col-8">{{ meeting.startDate | date:'dd.MM.yyyy HH:mm' }}</div>
               </div>
               <div class="row mb-2">
-                <div class="col-4 fw-bold">Bitis:</div>
+                <div class="col-4 fw-bold">Bitiş:</div>
                 <div class="col-8">{{ meeting.endDate | date:'dd.MM.yyyy HH:mm' }}</div>
               </div>
               <div class="row mb-2">
-                <div class="col-4 fw-bold">Aciklama:</div>
+                <div class="col-4 fw-bold">Açıklama:</div>
                 <div class="col-8">{{ meeting.description || '-' }}</div>
               </div>
               <div class="row mb-2">
-                <div class="col-4 fw-bold">Erisim Linki:</div>
+                <div class="col-4 fw-bold">Erişim Linki:</div>
                 <div class="col-8">
                   <code class="small">{{ getMeetingUrl() }}</code>
                   <button class="btn btn-sm btn-outline-secondary ms-2" (click)="copyLink()">Kopyala</button>
@@ -57,15 +57,15 @@ import { UserDto } from '../../core/models/auth.model';
             </div>
           </div>
 
-          <!-- Katilimcilar -->
+          <!-- Katılımcılar -->
           <div class="card shadow mb-4">
             <div class="card-body">
-              <h5 class="card-title">Katilimcilar</h5>
+              <h5 class="card-title">Katılımcılar</h5>
 
-              <!-- Dahili kullanici arama -->
+              <!-- Dahili kullanıcı arama -->
               <div class="mb-3">
-                <label class="form-label">Dahili Kullanici Ekle</label>
-                <input type="text" class="form-control" placeholder="Kullanici ara..."
+                <label class="form-label">Dahili Kullanıcı Ekle</label>
+                <input type="text" class="form-control" placeholder="Kullanıcı ara..."
                        [(ngModel)]="userSearch" (input)="searchUsers()">
                 @if (searchResults.length > 0) {
                   <ul class="list-group mt-1">
@@ -80,9 +80,9 @@ import { UserDto } from '../../core/models/auth.model';
                 }
               </div>
 
-              <!-- Harici katilimci -->
+              <!-- Harici katılımcı -->
               <div class="mb-3">
-                <label class="form-label">Harici Katilimci Ekle</label>
+                <label class="form-label">Harici Katılımcı Ekle</label>
                 <div class="row g-2">
                   <div class="col-md-5">
                     <input type="text" class="form-control" placeholder="Ad Soyad" [(ngModel)]="extName" name="extName">
@@ -126,25 +126,25 @@ import { UserDto } from '../../core/models/auth.model';
           </div>
         </div>
 
-        <!-- Dokumanlar -->
+        <!-- Dokümanlar -->
         <div class="col-md-4">
           <div class="card shadow">
             <div class="card-body">
-              <h5 class="card-title">Dokumanlar</h5>
+              <h5 class="card-title">Dokümanlar</h5>
               <div class="mb-3">
                 <input type="file" class="form-control" (change)="onFileSelect($event)">
                 @if (selectedFile) {
-                  <button class="btn btn-primary btn-sm mt-2" (click)="uploadDocument()">Yukle</button>
+                  <button class="btn btn-primary btn-sm mt-2" (click)="uploadDocument()">Yükle</button>
                 }
               </div>
               @for (doc of meeting.documents; track doc.id) {
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <span class="small">{{ doc.originalFileName }}</span>
-                  <button class="btn btn-sm btn-outline-primary" (click)="downloadDoc(doc.id)">Indir</button>
+                  <button class="btn btn-sm btn-outline-primary" (click)="downloadDoc(doc.id)">İndir</button>
                 </div>
               }
               @if (meeting.documents.length === 0) {
-                <p class="text-muted small">Henuz dokuman yok.</p>
+                <p class="text-muted small">Henüz doküman yok.</p>
               }
             </div>
           </div>
@@ -207,7 +207,7 @@ export class MeetingDetailComponent implements OnInit {
   }
 
   removeParticipant(p: ParticipantDto): void {
-    if (!confirm(`${p.fullName} katilimcisini silmek istiyor musunuz?`)) return;
+    if (!confirm(`${p.fullName} katılımcısını silmek istiyor musunuz?`)) return;
     this.meetingService.removeParticipant(this.meeting!.id, p.id)
       .subscribe(() => this.loadMeeting(this.meeting!.id));
   }
@@ -221,7 +221,7 @@ export class MeetingDetailComponent implements OnInit {
     if (!this.selectedFile || !this.meeting) return;
     this.meetingService.uploadDocument(this.meeting.id, this.selectedFile).subscribe({
       next: () => { this.loadMeeting(this.meeting!.id); this.selectedFile = null; },
-      error: (err) => alert(err.error?.message || 'Yukleme basarisiz.')
+      error: (err) => alert(err.error?.message || 'Yükleme başarısız.')
     });
   }
 
@@ -237,10 +237,10 @@ export class MeetingDetailComponent implements OnInit {
   }
 
   cancelMeeting(): void {
-    if (!confirm('Bu toplantiyi iptal etmek istiyor musunuz?')) return;
+    if (!confirm('Bu toplantıyı iptal etmek istiyor musunuz?')) return;
     this.meetingService.cancel(this.meeting!.id).subscribe({
       next: () => this.loadMeeting(this.meeting!.id),
-      error: (err) => alert(err.error?.message || 'Iptal basarisiz.')
+      error: (err) => alert(err.error?.message || 'İptal başarısız.')
     });
   }
 }

@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="col-md-6">
         <div class="card shadow">
           <div class="card-body p-4">
-            <h3 class="text-center mb-4">Kayit Ol</h3>
+            <h3 class="text-center mb-4">Kayıt Ol</h3>
             @if (error) {
               <div class="alert alert-danger">{{ error }}</div>
             }
@@ -36,7 +36,7 @@ import { AuthService } from '../../core/services/auth.service';
                 <input type="tel" class="form-control" [(ngModel)]="phone" name="phone" required>
               </div>
               <div class="mb-3">
-                <label class="form-label">Sifre</label>
+                <label class="form-label">Şifre</label>
                 <input type="password" class="form-control" [(ngModel)]="password" name="password" required minlength="6">
               </div>
               <div class="mb-3">
@@ -44,11 +44,11 @@ import { AuthService } from '../../core/services/auth.service';
                 <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*">
               </div>
               <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
-                {{ loading ? 'Kayit yapiliyor...' : 'Kayit Ol' }}
+                {{ loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol' }}
               </button>
             </form>
             <p class="text-center mt-3">
-              Zaten hesabiniz var mi? <a routerLink="/login">Giris Yap</a>
+              Zaten hesabınız var mı? <a routerLink="/login">Giriş Yap</a>
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export class RegisterComponent {
         this.router.navigate(['/meetings']);
       },
       error: (err) => {
-        this.error = err.error?.message || 'Kayit basarisiz.';
+        this.error = err.error?.message || 'Kayıt başarısız.';
         this.loading = false;
       }
     });

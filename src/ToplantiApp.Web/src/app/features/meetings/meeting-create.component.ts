@@ -8,34 +8,34 @@ import { MeetingService } from '../../core/services/meeting.service';
   selector: 'app-meeting-create',
   imports: [CommonModule, FormsModule],
   template: `
-    <h2 class="mb-4">Yeni Toplanti Olustur</h2>
+    <h2 class="mb-4">Yeni Toplantı Oluştur</h2>
     @if (error) {
       <div class="alert alert-danger">{{ error }}</div>
     }
     <form (ngSubmit)="onSubmit()" class="card shadow p-4">
       <div class="mb-3">
-        <label class="form-label">Toplanti Adi</label>
+        <label class="form-label">Toplantı Adı</label>
         <input type="text" class="form-control" [(ngModel)]="name" name="name" required>
       </div>
       <div class="mb-3">
-        <label class="form-label">Aciklama</label>
+        <label class="form-label">Açıklama</label>
         <textarea class="form-control" [(ngModel)]="description" name="description" rows="3"></textarea>
       </div>
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label class="form-label">Baslangic Tarihi</label>
+          <label class="form-label">Başlangıç Tarihi</label>
           <input type="datetime-local" class="form-control" [(ngModel)]="startDate" name="startDate" required>
         </div>
         <div class="col-md-6 mb-3">
-          <label class="form-label">Bitis Tarihi</label>
+          <label class="form-label">Bitiş Tarihi</label>
           <input type="datetime-local" class="form-control" [(ngModel)]="endDate" name="endDate" required>
         </div>
       </div>
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary" [disabled]="loading">
-          {{ loading ? 'Olusturuluyor...' : 'Olustur' }}
+          {{ loading ? 'Oluşturuluyor...' : 'Oluştur' }}
         </button>
-        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/meetings'])">Iptal</button>
+        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/meetings'])">İptal</button>
       </div>
     </form>
   `
@@ -61,7 +61,7 @@ export class MeetingCreateComponent {
     }).subscribe({
       next: (res) => this.router.navigate(['/meetings', res.data.id]),
       error: (err) => {
-        this.error = err.error?.message || 'Toplanti olusturulamadi.';
+        this.error = err.error?.message || 'Toplantı oluşturulamadı.';
         this.loading = false;
       }
     });
