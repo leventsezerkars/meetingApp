@@ -7,15 +7,18 @@ namespace ToplantiApp.Infrastructure.Jobs;
 [DisallowConcurrentExecution]
 public class CleanupCancelledMeetingsJob : IJob
 {
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
     private readonly ILogger<CleanupCancelledMeetingsJob> _logger;
 
     public CleanupCancelledMeetingsJob(
+        IMeetingRepository meetingRepository,
         IUnitOfWork unitOfWork,
         IFileService fileService,
         ILogger<CleanupCancelledMeetingsJob> logger)
     {
+        _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _logger = logger;
@@ -26,7 +29,7 @@ public class CleanupCancelledMeetingsJob : IJob
         _logger.LogInformation("Iptal edilmis toplanti temizleme job'i basladi.");
 
         var cutoffDate = DateTime.UtcNow.AddDays(-30);
-        var cancelledMeetings = await _unitOfWork.Meetings.GetCancelledMeetingsOlderThanAsync(cutoffDate);
+        var cancelledMeetings = await _meetingRepository.GetCancelledMeetingsOlderThanAsync(cutoffDate);
 
         if (cancelledMeetings.Count == 0)
         {
@@ -50,7 +53,7 @@ public class CleanupCancelledMeetingsJob : IJob
                 }
             }
 
-            _unitOfWork.Meetings.Delete(meeting);
+            _meetingRepository.Delete(meeting);
         }
 
         await _unitOfWork.SaveChangesAsync();

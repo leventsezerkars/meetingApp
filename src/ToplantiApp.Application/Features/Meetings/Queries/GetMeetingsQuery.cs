@@ -9,18 +9,18 @@ public record GetMeetingsQuery(int UserId) : IRequest<List<MeetingListDto>>;
 
 public class GetMeetingsQueryHandler : IRequestHandler<GetMeetingsQuery, List<MeetingListDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IMapper _mapper;
 
-    public GetMeetingsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetMeetingsQueryHandler(IMeetingRepository meetingRepository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _meetingRepository = meetingRepository;
         _mapper = mapper;
     }
 
     public async Task<List<MeetingListDto>> Handle(GetMeetingsQuery request, CancellationToken cancellationToken)
     {
-        var meetings = await _unitOfWork.Meetings.GetByUserIdAsync(request.UserId);
+        var meetings = await _meetingRepository.GetByUserIdAsync(request.UserId);
         return _mapper.Map<List<MeetingListDto>>(meetings);
     }
 }

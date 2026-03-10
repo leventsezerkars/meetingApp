@@ -24,17 +24,26 @@ public class AddParticipantCommandValidator : AbstractValidator<AddParticipantCo
 
 public class AddParticipantCommandHandler : IRequestHandler<AddParticipantCommand, ParticipantDto>
 {
+    private readonly IMeetingRepository _meetingRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IMeetingParticipantRepository _participantRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMailService _mailService;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
 
     public AddParticipantCommandHandler(
+        IMeetingRepository meetingRepository,
+        IUserRepository userRepository,
+        IMeetingParticipantRepository participantRepository,
         IUnitOfWork unitOfWork,
         IMailService mailService,
         IMapper mapper,
         IConfiguration configuration)
     {
+        _meetingRepository = meetingRepository;
+        _userRepository = userRepository;
+        _participantRepository = participantRepository;
         _unitOfWork = unitOfWork;
         _mailService = mailService;
         _mapper = mapper;
@@ -43,7 +52,7 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
 
     public async Task<ParticipantDto> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(request.MeetingId)
+        var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
 
         if (meeting.CreatedByUserId != request.UserId)
@@ -53,10 +62,10 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
 
         if (request.Data.UserId.HasValue)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(request.Data.UserId.Value)
+            var user = await _userRepository.GetByIdAsync(request.Data.UserId.Value)
                 ?? throw new NotFoundException("Kullanici", request.Data.UserId.Value);
 
-            if (await _unitOfWork.MeetingParticipants.IsParticipantAsync(request.MeetingId, user.Email))
+            if (await _participantRepository.IsParticipantAsync(request.MeetingId, user.Email))
                 throw new ConflictException("Bu kullanici zaten katilimci olarak eklenmis.");
 
             participant = new MeetingParticipant
@@ -70,7 +79,7 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         }
         else
         {
-            if (await _unitOfWork.MeetingParticipants.IsParticipantAsync(request.MeetingId, request.Data.Email!))
+            if (await _participantRepository.IsParticipantAsync(request.MeetingId, request.Data.Email!))
                 throw new ConflictException("Bu e-posta adresi zaten katilimci olarak eklenmis.");
 
             participant = new MeetingParticipant
@@ -82,7 +91,7 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
             };
         }
 
-        await _unitOfWork.MeetingParticipants.AddAsync(participant);
+        await _participantRepository.AddAsync(participant);
         await _unitOfWork.SaveChangesAsync();
 
         var frontendUrl = _configuration["App:FrontendUrl"] ?? "http://localhost:4200";

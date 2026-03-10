@@ -9,18 +9,18 @@ public record GetUsersForParticipantQuery(string SearchTerm) : IRequest<List<Use
 
 public class GetUsersForParticipantQueryHandler : IRequestHandler<GetUsersForParticipantQuery, List<UserDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public GetUsersForParticipantQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetUsersForParticipantQueryHandler(IUserRepository userRepository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _mapper = mapper;
     }
 
     public async Task<List<UserDto>> Handle(GetUsersForParticipantQuery request, CancellationToken cancellationToken)
     {
-        var users = await _unitOfWork.Users.SearchUsersAsync(request.SearchTerm);
+        var users = await _userRepository.SearchUsersAsync(request.SearchTerm);
         return _mapper.Map<List<UserDto>>(users);
     }
 }

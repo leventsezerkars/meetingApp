@@ -20,20 +20,20 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
 
-    public LoginCommandHandler(IUnitOfWork unitOfWork, ITokenService tokenService, IMapper mapper)
+    public LoginCommandHandler(IUserRepository userRepository, ITokenService tokenService, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _tokenService = tokenService;
         _mapper = mapper;
     }
 
     public async Task<AuthResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.Users.GetByEmailAsync(request.Data.Email)
+        var user = await _userRepository.GetByEmailAsync(request.Data.Email)
             ?? throw new AppException("E-posta veya sifre hatali.", 401);
 
         if (!BCrypt.Net.BCrypt.Verify(request.Data.Password, user.PasswordHash))

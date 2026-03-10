@@ -24,6 +24,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
 {
+    private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly IMailService _mailService;
@@ -31,12 +32,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     private readonly IMapper _mapper;
 
     public RegisterCommandHandler(
+        IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         ITokenService tokenService,
         IMailService mailService,
         IFileService fileService,
         IMapper mapper)
     {
+        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
         _mailService = mailService;
@@ -46,7 +49,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
 
     public async Task<AuthResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        if (await _unitOfWork.Users.EmailExistsAsync(request.Data.Email))
+        if (await _userRepository.EmailExistsAsync(request.Data.Email))
             throw new ConflictException("Bu e-posta adresi zaten kayitli.");
 
         var user = new User
@@ -65,7 +68,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             user.ProfileImagePath = filePath;
         }
 
-        await _unitOfWork.Users.AddAsync(user);
+        await _userRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
         _ = _mailService.SendWelcomeEmailAsync(user);

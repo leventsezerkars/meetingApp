@@ -10,18 +10,18 @@ public record GetMeetingByIdQuery(int Id) : IRequest<MeetingDto>;
 
 public class GetMeetingByIdQueryHandler : IRequestHandler<GetMeetingByIdQuery, MeetingDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IMapper _mapper;
 
-    public GetMeetingByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetMeetingByIdQueryHandler(IMeetingRepository meetingRepository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _meetingRepository = meetingRepository;
         _mapper = mapper;
     }
 
     public async Task<MeetingDto> Handle(GetMeetingByIdQuery request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(request.Id)
+        var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.Id)
             ?? throw new NotFoundException("Toplanti", request.Id);
 
         return _mapper.Map<MeetingDto>(meeting);

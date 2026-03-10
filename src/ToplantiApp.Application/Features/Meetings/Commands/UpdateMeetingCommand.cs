@@ -20,18 +20,20 @@ public class UpdateMeetingCommandValidator : AbstractValidator<UpdateMeetingComm
 
 public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand, MeetingDto>
 {
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateMeetingCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public UpdateMeetingCommandHandler(IMeetingRepository meetingRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
+        _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task<MeetingDto> Handle(UpdateMeetingCommand request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(request.Id)
+        var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.Id)
             ?? throw new NotFoundException("Toplanti", request.Id);
 
         if (meeting.CreatedByUserId != request.UserId)
@@ -42,7 +44,7 @@ public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand,
         meeting.StartDate = request.Data.StartDate;
         meeting.EndDate = request.Data.EndDate;
 
-        _unitOfWork.Meetings.Update(meeting);
+        _meetingRepository.Update(meeting);
         await _unitOfWork.SaveChangesAsync();
 
         return _mapper.Map<MeetingDto>(meeting);

@@ -15,13 +15,13 @@ public class MeetingDocumentController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IFileService _fileService;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMeetingRepository _meetingRepository;
 
-    public MeetingDocumentController(IMediator mediator, IFileService fileService, IUnitOfWork unitOfWork)
+    public MeetingDocumentController(IMediator mediator, IFileService fileService, IMeetingRepository meetingRepository)
     {
         _mediator = mediator;
         _fileService = fileService;
-        _unitOfWork = unitOfWork;
+        _meetingRepository = meetingRepository;
     }
 
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -39,7 +39,7 @@ public class MeetingDocumentController : ControllerBase
     [HttpGet("{documentId}")]
     public async Task<IActionResult> Download(int meetingId, int documentId)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(meetingId);
+        var meeting = await _meetingRepository.GetByIdWithDetailsAsync(meetingId);
         if (meeting == null) return NotFound();
 
         var document = meeting.Documents.FirstOrDefault(d => d.Id == documentId);

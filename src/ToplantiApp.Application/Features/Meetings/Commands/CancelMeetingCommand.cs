@@ -9,18 +9,20 @@ public record CancelMeetingCommand(int Id, int UserId) : IRequest<Unit>;
 
 public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand, Unit>
 {
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMailService _mailService;
 
-    public CancelMeetingCommandHandler(IUnitOfWork unitOfWork, IMailService mailService)
+    public CancelMeetingCommandHandler(IMeetingRepository meetingRepository, IUnitOfWork unitOfWork, IMailService mailService)
     {
+        _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _mailService = mailService;
     }
 
     public async Task<Unit> Handle(CancelMeetingCommand request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(request.Id)
+        var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.Id)
             ?? throw new NotFoundException("Toplanti", request.Id);
 
         if (meeting.CreatedByUserId != request.UserId)
@@ -32,7 +34,7 @@ public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand,
         meeting.Status = MeetingStatus.Cancelled;
         meeting.CancelledAt = DateTime.UtcNow;
 
-        _unitOfWork.Meetings.Update(meeting);
+        _meetingRepository.Update(meeting);
         await _unitOfWork.SaveChangesAsync();
 
         foreach (var participant in meeting.Participants)

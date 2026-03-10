@@ -17,12 +17,18 @@ public record UploadMeetingDocumentCommand(
 
 public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeetingDocumentCommand, MeetingDocumentDto>
 {
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
     private readonly IMapper _mapper;
 
-    public UploadMeetingDocumentCommandHandler(IUnitOfWork unitOfWork, IFileService fileService, IMapper mapper)
+    public UploadMeetingDocumentCommandHandler(
+        IMeetingRepository meetingRepository,
+        IUnitOfWork unitOfWork,
+        IFileService fileService,
+        IMapper mapper)
     {
+        _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _mapper = mapper;
@@ -30,7 +36,7 @@ public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeeting
 
     public async Task<MeetingDocumentDto> Handle(UploadMeetingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByIdAsync(request.MeetingId)
+        var meeting = await _meetingRepository.GetByIdAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
 
         if (meeting.CreatedByUserId != request.UserId)
@@ -50,7 +56,6 @@ public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeeting
             IsCompressed = isCompressed
         };
 
-        await _unitOfWork.Meetings.AddAsync(meeting);
         meeting.Documents.Add(document);
         await _unitOfWork.SaveChangesAsync();
 

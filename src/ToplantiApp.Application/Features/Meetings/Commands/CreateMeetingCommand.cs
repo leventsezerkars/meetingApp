@@ -21,11 +21,13 @@ public class CreateMeetingCommandValidator : AbstractValidator<CreateMeetingComm
 
 public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand, MeetingDto>
 {
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateMeetingCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public CreateMeetingCommandHandler(IMeetingRepository meetingRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
+        _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -42,10 +44,10 @@ public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand,
             AccessToken = Guid.NewGuid()
         };
 
-        await _unitOfWork.Meetings.AddAsync(meeting);
+        await _meetingRepository.AddAsync(meeting);
         await _unitOfWork.SaveChangesAsync();
 
-        var created = await _unitOfWork.Meetings.GetByIdWithDetailsAsync(meeting.Id);
+        var created = await _meetingRepository.GetByIdWithDetailsAsync(meeting.Id);
         return _mapper.Map<MeetingDto>(created);
     }
 }

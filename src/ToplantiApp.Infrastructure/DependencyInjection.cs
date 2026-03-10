@@ -18,6 +18,10 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMeetingRepository, MeetingRepository>();
+        services.AddScoped<IMeetingParticipantRepository, MeetingParticipantRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IMailService, MailService>();
         services.AddScoped<IFileService, FileService>();

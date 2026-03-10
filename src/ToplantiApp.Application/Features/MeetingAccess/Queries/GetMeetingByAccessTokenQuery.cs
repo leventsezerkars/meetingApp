@@ -10,18 +10,18 @@ public record GetMeetingByAccessTokenQuery(Guid AccessToken) : IRequest<MeetingA
 
 public class GetMeetingByAccessTokenQueryHandler : IRequestHandler<GetMeetingByAccessTokenQuery, MeetingAccessResultDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMeetingRepository _meetingRepository;
     private readonly IMapper _mapper;
 
-    public GetMeetingByAccessTokenQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetMeetingByAccessTokenQueryHandler(IMeetingRepository meetingRepository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _meetingRepository = meetingRepository;
         _mapper = mapper;
     }
 
     public async Task<MeetingAccessResultDto> Handle(GetMeetingByAccessTokenQuery request, CancellationToken cancellationToken)
     {
-        var meeting = await _unitOfWork.Meetings.GetByAccessTokenAsync(request.AccessToken);
+        var meeting = await _meetingRepository.GetByAccessTokenAsync(request.AccessToken);
 
         if (meeting == null)
             return new MeetingAccessResultDto(false, "Toplanti bulunamadi.", null);
