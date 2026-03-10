@@ -24,9 +24,9 @@ public class MeetingController : ControllerBase
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpGet]
-    public async Task<ActionResult<Response<List<MeetingListDto>>>> GetAll()
+    public async Task<ActionResult<PaginatedResponse<MeetingListDto>>> GetAll([FromQuery] PaginationRequest pagination)
     {
-        var result = await _mediator.Send(new GetMeetingsQuery(GetUserId()));
+        var result = await _mediator.Send(new GetMeetingsQuery(GetUserId(), pagination));
         return Ok(result);
     }
 
