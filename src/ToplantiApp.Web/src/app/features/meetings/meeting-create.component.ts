@@ -59,9 +59,9 @@ export class MeetingCreateComponent {
       startDate: new Date(this.startDate).toISOString(),
       endDate: new Date(this.endDate).toISOString()
     }).subscribe({
-      next: (meeting) => this.router.navigate(['/meetings', meeting.id]),
+      next: (res) => this.router.navigate(['/meetings', res.data.id]),
       error: (err) => {
-        this.error = err.error?.error || 'Toplanti olusturulamadi.';
+        this.error = err.error?.message || 'Toplanti olusturulamadi.';
         this.loading = false;
       }
     });

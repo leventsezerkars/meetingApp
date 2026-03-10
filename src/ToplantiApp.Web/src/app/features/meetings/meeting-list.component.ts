@@ -78,6 +78,6 @@ export class MeetingListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.meetingService.getAll().subscribe(meetings => this.meetings = meetings);
+    this.meetingService.getAll().subscribe(res => this.meetings = res.data);
   }
 }

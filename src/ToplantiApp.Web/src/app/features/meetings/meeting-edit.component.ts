@@ -57,7 +57,8 @@ export class MeetingEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.meetingId = Number(this.route.snapshot.paramMap.get('id'));
-    this.meetingService.getById(this.meetingId).subscribe(m => {
+    this.meetingService.getById(this.meetingId).subscribe(res => {
+      const m = res.data;
       this.name = m.name;
       this.description = m.description || '';
       this.startDate = this.toLocalDatetime(m.startDate);
@@ -81,7 +82,7 @@ export class MeetingEditComponent implements OnInit {
     }).subscribe({
       next: () => this.router.navigate(['/meetings', this.meetingId]),
       error: (err) => {
-        this.error = err.error?.error || 'Guncelleme basarisiz.';
+        this.error = err.error?.message || 'Guncelleme basarisiz.';
         this.loading = false;
       }
     });

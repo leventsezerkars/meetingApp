@@ -88,12 +88,12 @@ export class MeetingRoomComponent implements OnInit {
   ngOnInit(): void {
     const token = this.route.snapshot.paramMap.get('accessToken')!;
     this.meetingService.getMeetingRoom(token).subscribe({
-      next: (res) => { this.result = res; this.loading = false; },
+      next: (res) => { this.result = res.data; this.loading = false; },
       error: (err) => {
-        if (err.status === 403) {
-          this.result = err.error;
+        if (err.error?.data) {
+          this.result = err.error.data;
         } else {
-          this.errorMsg = 'Toplanti bulunamadi veya bir hata olustu.';
+          this.errorMsg = err.error?.message || 'Toplanti bulunamadi veya bir hata olustu.';
         }
         this.loading = false;
       }

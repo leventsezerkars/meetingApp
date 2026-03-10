@@ -54,7 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/meetings']);
       },
       error: (err) => {
-        this.error = err.error?.error || 'Giris basarisiz.';
+        this.error = err.error?.message || 'Giris basarisiz.';
         this.loading = false;
       }
     });

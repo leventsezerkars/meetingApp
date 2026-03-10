@@ -173,7 +173,7 @@ export class MeetingDetailComponent implements OnInit {
   }
 
   loadMeeting(id: number): void {
-    this.meetingService.getById(id).subscribe(m => this.meeting = m);
+    this.meetingService.getById(id).subscribe(res => this.meeting = res.data);
   }
 
   getMeetingUrl(): string {
@@ -186,13 +186,13 @@ export class MeetingDetailComponent implements OnInit {
 
   searchUsers(): void {
     if (this.userSearch.length < 2) { this.searchResults = []; return; }
-    this.meetingService.searchUsers(this.userSearch).subscribe(r => this.searchResults = r);
+    this.meetingService.searchUsers(this.userSearch).subscribe(res => this.searchResults = res.data);
   }
 
   addInternalParticipant(user: UserDto): void {
     this.meetingService.addParticipant(this.meeting!.id, { userId: user.id }).subscribe({
       next: () => { this.loadMeeting(this.meeting!.id); this.searchResults = []; this.userSearch = ''; },
-      error: (err) => alert(err.error?.error || 'Hata')
+      error: (err) => alert(err.error?.message || 'Hata')
     });
   }
 
@@ -202,7 +202,7 @@ export class MeetingDetailComponent implements OnInit {
       email: this.extEmail, fullName: this.extName
     }).subscribe({
       next: () => { this.loadMeeting(this.meeting!.id); this.extName = ''; this.extEmail = ''; },
-      error: (err) => alert(err.error?.error || 'Hata')
+      error: (err) => alert(err.error?.message || 'Hata')
     });
   }
 
@@ -221,7 +221,7 @@ export class MeetingDetailComponent implements OnInit {
     if (!this.selectedFile || !this.meeting) return;
     this.meetingService.uploadDocument(this.meeting.id, this.selectedFile).subscribe({
       next: () => { this.loadMeeting(this.meeting!.id); this.selectedFile = null; },
-      error: (err) => alert(err.error?.error || 'Yukleme basarisiz.')
+      error: (err) => alert(err.error?.message || 'Yukleme basarisiz.')
     });
   }
 
@@ -240,7 +240,7 @@ export class MeetingDetailComponent implements OnInit {
     if (!confirm('Bu toplantiyi iptal etmek istiyor musunuz?')) return;
     this.meetingService.cancel(this.meeting!.id).subscribe({
       next: () => this.loadMeeting(this.meeting!.id),
-      error: (err) => alert(err.error?.error || 'Iptal basarisiz.')
+      error: (err) => alert(err.error?.message || 'Iptal basarisiz.')
     });
   }
 }

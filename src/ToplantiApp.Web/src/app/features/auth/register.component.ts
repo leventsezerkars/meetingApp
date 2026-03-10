@@ -94,7 +94,7 @@ export class RegisterComponent {
         this.router.navigate(['/meetings']);
       },
       error: (err) => {
-        this.error = err.error?.error || 'Kayit basarisiz.';
+        this.error = err.error?.message || 'Kayit basarisiz.';
         this.loading = false;
       }
     });
