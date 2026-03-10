@@ -8,7 +8,7 @@ public class MeetingConfiguration : IEntityTypeConfiguration<Meeting>
 {
     public void Configure(EntityTypeBuilder<Meeting> builder)
     {
-        builder.ToTable("Meetings");
+        builder.ToTable("Meeting");
 
         builder.HasKey(m => m.Id);
 

@@ -8,7 +8,7 @@ public class MeetingLogConfiguration : IEntityTypeConfiguration<MeetingLog>
 {
     public void Configure(EntityTypeBuilder<MeetingLog> builder)
     {
-        builder.ToTable("MeetingLogs");
+        builder.ToTable("MeetingLog");
 
         builder.HasKey(l => l.Id);
 

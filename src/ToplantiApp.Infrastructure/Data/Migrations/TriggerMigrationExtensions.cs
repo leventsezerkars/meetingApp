@@ -11,12 +11,12 @@ public static class TriggerMigrationExtensions
             BEGIN
                 EXEC('
                     CREATE TRIGGER trg_Meeting_AfterDelete
-                    ON Meetings
+                    ON Meeting
                     AFTER DELETE
                     AS
                     BEGIN
                         SET NOCOUNT ON;
-                        INSERT INTO MeetingLogs (MeetingId, MeetingName, DeletedBySystem, DeletedAt, LogData)
+                        INSERT INTO MeetingLog (MeetingId, MeetingName, DeletedBySystem, DeletedAt, LogData)
                         SELECT 
                             d.Id, 
                             d.Name, 
