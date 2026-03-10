@@ -12,43 +12,51 @@ public record UpdateMeetingDto(
     DateTime StartDate,
     DateTime EndDate);
 
-public record MeetingDto(
-    int Id,
-    string Name,
-    string? Description,
-    DateTime StartDate,
-    DateTime EndDate,
-    string Status,
-    DateTime? CancelledAt,
-    Guid AccessToken,
-    string MeetingUrl,
-    UserDto CreatedBy,
-    List<ParticipantDto> Participants,
-    List<MeetingDocumentDto> Documents,
-    DateTime CreatedAt);
+public record MeetingDto
+{
+    public int Id { get; init; }
+    public string Name { get; init; } = default!;
+    public string? Description { get; init; }
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public string Status { get; init; } = default!;
+    public DateTime? CancelledAt { get; init; }
+    public Guid AccessToken { get; init; }
+    public string MeetingUrl { get; init; } = default!;
+    public UserDto CreatedBy { get; init; } = default!;
+    public List<ParticipantDto> Participants { get; init; } = [];
+    public List<MeetingDocumentDto> Documents { get; init; } = [];
+    public DateTime CreatedAt { get; init; }
+}
 
-public record MeetingListDto(
-    int Id,
-    string Name,
-    DateTime StartDate,
-    DateTime EndDate,
-    string Status,
-    int ParticipantCount,
-    string CreatedByName,
-    DateTime CreatedAt);
+public record MeetingListDto
+{
+    public int Id { get; init; }
+    public string Name { get; init; } = default!;
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public string Status { get; init; } = default!;
+    public int ParticipantCount { get; init; }
+    public string CreatedByName { get; init; } = default!;
+    public DateTime CreatedAt { get; init; }
+}
 
-public record MeetingRoomDto(
-    int Id,
-    string Name,
-    string? Description,
-    DateTime StartDate,
-    DateTime EndDate,
-    string Status,
-    string CreatedByName,
-    List<ParticipantDto> Participants,
-    List<MeetingDocumentDto> Documents);
+public record MeetingRoomDto
+{
+    public int Id { get; init; }
+    public string Name { get; init; } = default!;
+    public string? Description { get; init; }
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public string Status { get; init; } = default!;
+    public string CreatedByName { get; init; } = default!;
+    public List<ParticipantDto> Participants { get; init; } = [];
+    public List<MeetingDocumentDto> Documents { get; init; } = [];
+}
 
-public record MeetingAccessResultDto(
-    bool IsAccessible,
-    string? Message,
-    MeetingRoomDto? Meeting);
+public record MeetingAccessResultDto
+{
+    public bool IsAccessible { get; init; }
+    public string? Message { get; init; }
+    public MeetingRoomDto? Meeting { get; init; }
+}

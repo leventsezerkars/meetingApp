@@ -25,21 +25,24 @@ public class GetMeetingByAccessTokenQueryHandler : IRequestHandler<GetMeetingByA
         var meeting = await _meetingRepository.GetByAccessTokenAsync(request.AccessToken);
 
         if (meeting == null)
-            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto(false, "Toplanti bulunamadi.", null));
+            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = false, Message = "Toplantı bulunamadı." });
 
         if (meeting.Status == MeetingStatus.Cancelled)
-            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto(false, "Bu toplanti iptal edilmistir.", null));
+            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = false, Message = "Bu toplantı iptal edilmiştir." });
 
         var now = DateTime.UtcNow;
 
         if (now < meeting.StartDate)
-            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto(false,
-                $"Toplanti henuz baslamadi. Baslangic: {meeting.StartDate:dd.MM.yyyy HH:mm}", null));
+            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto
+            {
+                IsAccessible = false,
+                Message = $"Toplantı henüz başlamadı. Başlangıç: {meeting.StartDate:dd.MM.yyyy HH:mm}"
+            });
 
         if (now > meeting.EndDate)
-            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto(false, "Toplanti sona ermistir.", null));
+            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = false, Message = "Toplantı sona ermiştir." });
 
         var meetingRoom = _mapper.Map<MeetingRoomDto>(meeting);
-        return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto(true, null, meetingRoom));
+        return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = true, Meeting = meetingRoom });
     }
 }

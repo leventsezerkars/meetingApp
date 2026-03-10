@@ -77,6 +77,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Response<
         var token = _tokenService.GenerateToken(user);
         var userDto = _mapper.Map<UserDto>(user);
 
-        return Response<AuthResponseDto>.Ok(new AuthResponseDto(token, userDto));
+        return Response<AuthResponseDto>.Ok(new AuthResponseDto { Token = token, User = userDto });
     }
 }
