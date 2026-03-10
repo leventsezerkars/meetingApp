@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using ToplantiApp.Domain.Interfaces;
 using ToplantiApp.Infrastructure.Data;
+using ToplantiApp.Infrastructure.Data.Interceptors;
 using ToplantiApp.Infrastructure.Jobs;
 using ToplantiApp.Infrastructure.Repositories;
 using ToplantiApp.Infrastructure.Services;
@@ -14,8 +15,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        services.AddSingleton<AuditSaveChangesInterceptor>();
+
+        services.AddDbContext<AppDbContext>((sp, options) =>
+            options
+                .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+                .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
