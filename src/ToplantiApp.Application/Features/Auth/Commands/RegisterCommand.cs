@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
@@ -8,7 +9,7 @@ using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Auth.Commands;
 
-public record RegisterCommand(RegisterDto Data, Stream? ProfileImage, string? ProfileImageFileName) : IRequest<AuthResponseDto>;
+public record RegisterCommand(RegisterDto Data, Stream? ProfileImage, string? ProfileImageFileName) : IRequest<Response<AuthResponseDto>>;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
@@ -22,7 +23,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     }
 }
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Response<AuthResponseDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -47,7 +48,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         _mapper = mapper;
     }
 
-    public async Task<AuthResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Response<AuthResponseDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         if (await _userRepository.EmailExistsAsync(request.Data.Email))
             throw new ConflictException("Bu e-posta adresi zaten kayitli.");
@@ -76,6 +77,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         var token = _tokenService.GenerateToken(user);
         var userDto = _mapper.Map<UserDto>(user);
 
-        return new AuthResponseDto(token, userDto);
+        return Response<AuthResponseDto>.Ok(new AuthResponseDto(token, userDto));
     }
 }

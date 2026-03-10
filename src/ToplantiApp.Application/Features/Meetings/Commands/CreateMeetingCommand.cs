@@ -1,13 +1,14 @@
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Meetings.Commands;
 
-public record CreateMeetingCommand(CreateMeetingDto Data, int UserId) : IRequest<MeetingDto>;
+public record CreateMeetingCommand(CreateMeetingDto Data, int UserId) : IRequest<Response<MeetingDto>>;
 
 public class CreateMeetingCommandValidator : AbstractValidator<CreateMeetingCommand>
 {
@@ -19,7 +20,7 @@ public class CreateMeetingCommandValidator : AbstractValidator<CreateMeetingComm
     }
 }
 
-public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand, MeetingDto>
+public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand, Response<MeetingDto>>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -32,7 +33,7 @@ public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand,
         _mapper = mapper;
     }
 
-    public async Task<MeetingDto> Handle(CreateMeetingCommand request, CancellationToken cancellationToken)
+    public async Task<Response<MeetingDto>> Handle(CreateMeetingCommand request, CancellationToken cancellationToken)
     {
         var meeting = new Meeting
         {
@@ -48,6 +49,6 @@ public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand,
         await _unitOfWork.SaveChangesAsync();
 
         var created = await _meetingRepository.GetByIdWithDetailsAsync(meeting.Id);
-        return _mapper.Map<MeetingDto>(created);
+        return Response<MeetingDto>.Ok(_mapper.Map<MeetingDto>(created));
     }
 }

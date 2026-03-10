@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.Meetings.Commands;
 using ToplantiApp.Application.Features.Meetings.Queries;
@@ -23,37 +24,37 @@ public class MeetingController : ControllerBase
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpGet]
-    public async Task<ActionResult<List<MeetingListDto>>> GetAll()
+    public async Task<ActionResult<Response<List<MeetingListDto>>>> GetAll()
     {
         var result = await _mediator.Send(new GetMeetingsQuery(GetUserId()));
         return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<MeetingDto>> GetById(int id)
+    public async Task<ActionResult<Response<MeetingDto>>> GetById(int id)
     {
         var result = await _mediator.Send(new GetMeetingByIdQuery(id));
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<MeetingDto>> Create([FromBody] CreateMeetingDto data)
+    public async Task<ActionResult<Response<MeetingDto>>> Create([FromBody] CreateMeetingDto data)
     {
         var result = await _mediator.Send(new CreateMeetingCommand(data, GetUserId()));
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<MeetingDto>> Update(int id, [FromBody] UpdateMeetingDto data)
+    public async Task<ActionResult<Response<MeetingDto>>> Update(int id, [FromBody] UpdateMeetingDto data)
     {
         var result = await _mediator.Send(new UpdateMeetingCommand(id, data, GetUserId()));
         return Ok(result);
     }
 
     [HttpPut("{id}/cancel")]
-    public async Task<IActionResult> Cancel(int id)
+    public async Task<ActionResult<Response>> Cancel(int id)
     {
-        await _mediator.Send(new CancelMeetingCommand(id, GetUserId()));
-        return NoContent();
+        var result = await _mediator.Send(new CancelMeetingCommand(id, GetUserId()));
+        return Ok(result);
     }
 }

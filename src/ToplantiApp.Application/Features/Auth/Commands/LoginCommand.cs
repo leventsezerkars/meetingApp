@@ -1,13 +1,14 @@
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Auth.Commands;
 
-public record LoginCommand(LoginDto Data) : IRequest<AuthResponseDto>;
+public record LoginCommand(LoginDto Data) : IRequest<Response<AuthResponseDto>>;
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
@@ -18,7 +19,7 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     }
 }
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, Response<AuthResponseDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
@@ -31,7 +32,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         _mapper = mapper;
     }
 
-    public async Task<AuthResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<Response<AuthResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByEmailAsync(request.Data.Email)
             ?? throw new AppException("E-posta veya sifre hatali.", 401);
@@ -42,6 +43,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         var token = _tokenService.GenerateToken(user);
         var userDto = _mapper.Map<UserDto>(user);
 
-        return new AuthResponseDto(token, userDto);
+        return Response<AuthResponseDto>.Ok(new AuthResponseDto(token, userDto));
     }
 }

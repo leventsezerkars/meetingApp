@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
@@ -10,7 +11,7 @@ using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Participants.Commands;
 
-public record AddParticipantCommand(int MeetingId, AddParticipantDto Data, int UserId) : IRequest<ParticipantDto>;
+public record AddParticipantCommand(int MeetingId, AddParticipantDto Data, int UserId) : IRequest<Response<ParticipantDto>>;
 
 public class AddParticipantCommandValidator : AbstractValidator<AddParticipantCommand>
 {
@@ -22,7 +23,7 @@ public class AddParticipantCommandValidator : AbstractValidator<AddParticipantCo
     }
 }
 
-public class AddParticipantCommandHandler : IRequestHandler<AddParticipantCommand, ParticipantDto>
+public class AddParticipantCommandHandler : IRequestHandler<AddParticipantCommand, Response<ParticipantDto>>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUserRepository _userRepository;
@@ -50,7 +51,7 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         _configuration = configuration;
     }
 
-    public async Task<ParticipantDto> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
+    public async Task<Response<ParticipantDto>> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
     {
         var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
@@ -100,6 +101,6 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         _ = _mailService.SendMeetingInvitationAsync(
             participant.Email, participant.FullName, meeting, meetingUrl);
 
-        return _mapper.Map<ParticipantDto>(participant);
+        return Response<ParticipantDto>.Ok(_mapper.Map<ParticipantDto>(participant));
     }
 }

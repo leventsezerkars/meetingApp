@@ -1,5 +1,6 @@
 using AutoMapper;
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
@@ -13,9 +14,9 @@ public record UploadMeetingDocumentCommand(
     string FileName,
     string ContentType,
     int UserId,
-    bool Compress = true) : IRequest<MeetingDocumentDto>;
+    bool Compress = true) : IRequest<Response<MeetingDocumentDto>>;
 
-public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeetingDocumentCommand, MeetingDocumentDto>
+public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeetingDocumentCommand, Response<MeetingDocumentDto>>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -34,7 +35,7 @@ public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeeting
         _mapper = mapper;
     }
 
-    public async Task<MeetingDocumentDto> Handle(UploadMeetingDocumentCommand request, CancellationToken cancellationToken)
+    public async Task<Response<MeetingDocumentDto>> Handle(UploadMeetingDocumentCommand request, CancellationToken cancellationToken)
     {
         var meeting = await _meetingRepository.GetByIdAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
@@ -59,6 +60,6 @@ public class UploadMeetingDocumentCommandHandler : IRequestHandler<UploadMeeting
         meeting.Documents.Add(document);
         await _unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<MeetingDocumentDto>(document);
+        return Response<MeetingDocumentDto>.Ok(_mapper.Map<MeetingDocumentDto>(document));
     }
 }

@@ -1,13 +1,14 @@
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Meetings.Commands;
 
-public record UpdateMeetingCommand(int Id, UpdateMeetingDto Data, int UserId) : IRequest<MeetingDto>;
+public record UpdateMeetingCommand(int Id, UpdateMeetingDto Data, int UserId) : IRequest<Response<MeetingDto>>;
 
 public class UpdateMeetingCommandValidator : AbstractValidator<UpdateMeetingCommand>
 {
@@ -18,7 +19,7 @@ public class UpdateMeetingCommandValidator : AbstractValidator<UpdateMeetingComm
     }
 }
 
-public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand, MeetingDto>
+public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand, Response<MeetingDto>>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -31,7 +32,7 @@ public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand,
         _mapper = mapper;
     }
 
-    public async Task<MeetingDto> Handle(UpdateMeetingCommand request, CancellationToken cancellationToken)
+    public async Task<Response<MeetingDto>> Handle(UpdateMeetingCommand request, CancellationToken cancellationToken)
     {
         var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.Id)
             ?? throw new NotFoundException("Toplanti", request.Id);
@@ -47,6 +48,6 @@ public class UpdateMeetingCommandHandler : IRequestHandler<UpdateMeetingCommand,
         _meetingRepository.Update(meeting);
         await _unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<MeetingDto>(meeting);
+        return Response<MeetingDto>.Ok(_mapper.Map<MeetingDto>(meeting));
     }
 }

@@ -1,13 +1,14 @@
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Domain.Enums;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Meetings.Commands;
 
-public record CancelMeetingCommand(int Id, int UserId) : IRequest<Unit>;
+public record CancelMeetingCommand(int Id, int UserId) : IRequest<Response>;
 
-public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand, Unit>
+public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand, Response>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -20,7 +21,7 @@ public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand,
         _mailService = mailService;
     }
 
-    public async Task<Unit> Handle(CancelMeetingCommand request, CancellationToken cancellationToken)
+    public async Task<Response> Handle(CancelMeetingCommand request, CancellationToken cancellationToken)
     {
         var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.Id)
             ?? throw new NotFoundException("Toplanti", request.Id);
@@ -47,6 +48,6 @@ public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand,
                 "Bu toplanti iptal edilmistir.");
         }
 
-        return Unit.Value;
+        return Response.Ok("Toplanti iptal edildi.");
     }
 }

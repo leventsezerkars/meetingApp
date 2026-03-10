@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.MeetingAccess.Queries;
 
@@ -17,11 +18,11 @@ public class MeetingAccessController : ControllerBase
     }
 
     [HttpGet("{accessToken:guid}")]
-    public async Task<ActionResult<MeetingAccessResultDto>> GetByAccessToken(Guid accessToken)
+    public async Task<ActionResult<Response<MeetingAccessResultDto>>> GetByAccessToken(Guid accessToken)
     {
         var result = await _mediator.Send(new GetMeetingByAccessTokenQuery(accessToken));
 
-        if (!result.IsAccessible)
+        if (result.Data != null && !result.Data.IsAccessible)
             return StatusCode(403, result);
 
         return Ok(result);

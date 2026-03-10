@@ -1,12 +1,13 @@
 using MediatR;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Participants.Commands;
 
-public record RemoveParticipantCommand(int MeetingId, int ParticipantId, int UserId) : IRequest<Unit>;
+public record RemoveParticipantCommand(int MeetingId, int ParticipantId, int UserId) : IRequest<Response>;
 
-public class RemoveParticipantCommandHandler : IRequestHandler<RemoveParticipantCommand, Unit>
+public class RemoveParticipantCommandHandler : IRequestHandler<RemoveParticipantCommand, Response>
 {
     private readonly IMeetingRepository _meetingRepository;
     private readonly IMeetingParticipantRepository _participantRepository;
@@ -22,7 +23,7 @@ public class RemoveParticipantCommandHandler : IRequestHandler<RemoveParticipant
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(RemoveParticipantCommand request, CancellationToken cancellationToken)
+    public async Task<Response> Handle(RemoveParticipantCommand request, CancellationToken cancellationToken)
     {
         var meeting = await _meetingRepository.GetByIdAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
@@ -36,6 +37,6 @@ public class RemoveParticipantCommandHandler : IRequestHandler<RemoveParticipant
         _participantRepository.Delete(participant);
         await _unitOfWork.SaveChangesAsync();
 
-        return Unit.Value;
+        return Response.Ok("Katilimci cikarildi.");
     }
 }

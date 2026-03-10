@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.Meetings.Commands;
 using ToplantiApp.Domain.Interfaces;
@@ -27,7 +28,7 @@ public class MeetingDocumentController : ControllerBase
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpPost]
-    public async Task<ActionResult<MeetingDocumentDto>> Upload(int meetingId, IFormFile file, [FromQuery] bool compress = true)
+    public async Task<ActionResult<Response<MeetingDocumentDto>>> Upload(int meetingId, IFormFile file, [FromQuery] bool compress = true)
     {
         var command = new UploadMeetingDocumentCommand(
             meetingId, file.OpenReadStream(), file.FileName, file.ContentType, GetUserId(), compress);

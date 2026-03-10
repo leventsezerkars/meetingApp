@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.Auth.Commands;
 
@@ -18,7 +18,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register(
+    public async Task<ActionResult<Response<AuthResponseDto>>> Register(
         [FromForm] RegisterDto data,
         IFormFile? profileImage)
     {
@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto data)
+    public async Task<ActionResult<Response<AuthResponseDto>>> Login([FromBody] LoginDto data)
     {
         var result = await _mediator.Send(new LoginCommand(data));
         return Ok(result);
