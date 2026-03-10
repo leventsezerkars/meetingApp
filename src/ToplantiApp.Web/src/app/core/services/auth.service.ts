@@ -1,8 +1,9 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 import { AuthResponse, LoginDto, UserDto } from '../models/auth.model';
+import { ApiResponse } from '../models/response.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -18,14 +19,14 @@ export class AuthService {
     this.loadFromStorage();
   }
 
-  register(formData: FormData): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, formData)
-      .pipe(tap(res => this.handleAuth(res)));
+  register(formData: FormData): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, formData)
+      .pipe(tap(res => this.handleAuth(res.data)));
   }
 
-  login(data: LoginDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data)
-      .pipe(tap(res => this.handleAuth(res)));
+  login(data: LoginDto): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/login`, data)
+      .pipe(tap(res => this.handleAuth(res.data)));
   }
 
   logout(): void {
@@ -40,11 +41,11 @@ export class AuthService {
     return this.token();
   }
 
-  private handleAuth(res: AuthResponse): void {
-    this.token.set(res.token);
-    this.currentUser.set(res.user);
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('user', JSON.stringify(res.user));
+  private handleAuth(data: AuthResponse): void {
+    this.token.set(data.token);
+    this.currentUser.set(data.user);
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
   }
 
   private loadFromStorage(): void {
