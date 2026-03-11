@@ -10,35 +10,7 @@ import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 @Component({
   selector: 'app-meeting-edit',
   imports: [CommonModule, FormsModule],
-  template: `
-    <h2 class="mb-4">Toplantı Düzenle</h2>
-    <form (ngSubmit)="onSubmit()" class="card shadow p-4">
-      <div class="mb-3">
-        <label class="form-label">Toplantı Adı</label>
-        <input type="text" class="form-control" [(ngModel)]="name" name="name" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Açıklama</label>
-        <textarea class="form-control" [(ngModel)]="description" name="description" rows="3"></textarea>
-      </div>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Başlangıç Tarihi</label>
-          <input type="datetime-local" class="form-control" [(ngModel)]="startDate" name="startDate" required>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Bitiş Tarihi</label>
-          <input type="datetime-local" class="form-control" [(ngModel)]="endDate" name="endDate" required>
-        </div>
-      </div>
-      <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary" [disabled]="loading">
-          {{ loading ? 'Kaydediliyor...' : 'Kaydet' }}
-        </button>
-        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/meetings', meetingId])">İptal</button>
-      </div>
-    </form>
-  `
+  templateUrl: './meeting-edit.component.html'
 })
 export class MeetingEditComponent implements OnInit {
   meetingId = 0;

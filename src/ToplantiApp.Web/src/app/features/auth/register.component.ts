@@ -10,51 +10,7 @@ import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 @Component({
   selector: 'app-register',
   imports: [CommonModule, FormsModule, RouterLink],
-  template: `
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-body p-4">
-            <h3 class="text-center mb-4">Kayıt Ol</h3>
-            <form (ngSubmit)="onSubmit()">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Ad</label>
-                  <input type="text" class="form-control" [(ngModel)]="firstName" name="firstName" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Soyad</label>
-                  <input type="text" class="form-control" [(ngModel)]="lastName" name="lastName" required>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">E-posta</label>
-                <input type="email" class="form-control" [(ngModel)]="email" name="email" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Telefon</label>
-                <input type="tel" class="form-control" [(ngModel)]="phone" name="phone" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Şifre</label>
-                <input type="password" class="form-control" [(ngModel)]="password" name="password" required minlength="6">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Profil Resmi</label>
-                <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*">
-              </div>
-              <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
-                {{ loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol' }}
-              </button>
-            </form>
-            <p class="text-center mt-3">
-              Zaten hesabınız var mı? <a routerLink="/login">Giriş Yap</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './register.component.html'
 })
 export class RegisterComponent implements OnInit {
   firstName = '';
