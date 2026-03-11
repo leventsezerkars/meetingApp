@@ -44,6 +44,7 @@ Thumbs.db
 desktop.ini
 
 # Uploads
+uploads/
 wwwroot/uploads/
 
 # Docker
