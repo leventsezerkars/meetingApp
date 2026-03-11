@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingAccessResult } from '../../core/models/meeting.model';
+import { formatUtcToLocal } from '../../core/utils/date.utils';
+import { getApiErrorMessage } from '../../core/utils/api-error.utils';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-meeting-room',
@@ -37,8 +40,8 @@ import { MeetingAccessResult } from '../../core/models/meeting.model';
           <div class="card-body">
             <div class="row mb-4">
               <div class="col-md-6">
-                <p><strong>Başlangıç:</strong> {{ result.meeting.startDate | date:'dd.MM.yyyy HH:mm' }}</p>
-                <p><strong>Bitiş:</strong> {{ result.meeting.endDate | date:'dd.MM.yyyy HH:mm' }}</p>
+                <p><strong>Başlangıç:</strong> {{ formatUtcToLocal(result.meeting.startDate) }}</p>
+                <p><strong>Bitiş:</strong> {{ formatUtcToLocal(result.meeting.endDate) }}</p>
               </div>
               <div class="col-md-6">
                 <p><strong>Açıklama:</strong> {{ result.meeting.description || '-' }}</p>
@@ -82,8 +85,13 @@ export class MeetingRoomComponent implements OnInit {
   result: MeetingAccessResult | null = null;
   loading = true;
   errorMsg = '';
+  readonly formatUtcToLocal = formatUtcToLocal;
 
-  constructor(private route: ActivatedRoute, private meetingService: MeetingService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private meetingService: MeetingService,
+    private toast: ToastService
+  ) {}
 
   ngOnInit(): void {
     const token = this.route.snapshot.paramMap.get('accessToken')!;
@@ -93,7 +101,8 @@ export class MeetingRoomComponent implements OnInit {
         if (err.error?.data) {
           this.result = err.error.data;
         } else {
-          this.errorMsg = err.error?.message || 'Toplantı bulunamadı veya bir hata oluştu.';
+          this.errorMsg = getApiErrorMessage(err, 'Toplantı bulunamadı veya bir hata oluştu.');
+          this.toast.error(this.errorMsg);
         }
         this.loading = false;
       }

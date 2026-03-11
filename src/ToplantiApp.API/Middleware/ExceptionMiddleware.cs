@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FluentValidation;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
 
 namespace ToplantiApp.API.Middleware;
@@ -8,6 +9,10 @@ public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
@@ -33,7 +38,7 @@ public class ExceptionMiddleware
         {
             AppException appEx => (appEx.StatusCode, appEx.Message),
             ValidationException valEx => (400, valEx.Message),
-            _ => (500, "Beklenmeyen bir hata olustu.")
+            _ => (500, "Beklenmeyen bir hata oluştu.")
         };
 
         if (statusCode == 500)
@@ -42,7 +47,7 @@ public class ExceptionMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
 
-        var response = JsonSerializer.Serialize(new { error = message, statusCode });
-        await context.Response.WriteAsync(response);
+        var response = Response.Fail(message, statusCode);
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, JsonOptions));
     }
 }

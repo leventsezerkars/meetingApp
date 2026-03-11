@@ -3,15 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MeetingService } from '../../core/services/meeting.service';
+import { ToastService } from '../../core/services/toast.service';
+import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 
 @Component({
   selector: 'app-meeting-create',
   imports: [CommonModule, FormsModule],
   template: `
     <h2 class="mb-4">Yeni Toplantı Oluştur</h2>
-    @if (error) {
-      <div class="alert alert-danger">{{ error }}</div>
-    }
     <form (ngSubmit)="onSubmit()" class="card shadow p-4">
       <div class="mb-3">
         <label class="form-label">Toplantı Adı</label>
@@ -45,23 +44,28 @@ export class MeetingCreateComponent {
   description = '';
   startDate = '';
   endDate = '';
-  error = '';
   loading = false;
 
-  constructor(private meetingService: MeetingService, public router: Router) {}
+  constructor(
+    private meetingService: MeetingService,
+    public router: Router,
+    private toast: ToastService
+  ) {}
 
   onSubmit(): void {
     this.loading = true;
-    this.error = '';
     this.meetingService.create({
       name: this.name,
       description: this.description || undefined,
       startDate: new Date(this.startDate).toISOString(),
       endDate: new Date(this.endDate).toISOString()
     }).subscribe({
-      next: (res) => this.router.navigate(['/meetings', res.data.id]),
+      next: (res) => {
+        this.toast.success('Toplantı oluşturuldu.');
+        this.router.navigate(['/meetings', res.data.id]);
+      },
       error: (err) => {
-        this.error = err.error?.message || 'Toplantı oluşturulamadı.';
+        this.toast.error(getApiErrorMessage(err, 'Toplantı oluşturulamadı.'));
         this.loading = false;
       }
     });

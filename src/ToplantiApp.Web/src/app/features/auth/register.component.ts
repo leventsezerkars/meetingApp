@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
+import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 
 @Component({
   selector: 'app-register',
@@ -13,9 +15,6 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="card shadow">
           <div class="card-body p-4">
             <h3 class="text-center mb-4">Kayıt Ol</h3>
-            @if (error) {
-              <div class="alert alert-danger">{{ error }}</div>
-            }
             <form (ngSubmit)="onSubmit()">
               <div class="row">
                 <div class="col-md-6 mb-3">
@@ -63,10 +62,13 @@ export class RegisterComponent {
   phone = '';
   password = '';
   profileImage: File | null = null;
-  error = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toast: ToastService
+  ) {}
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -77,7 +79,6 @@ export class RegisterComponent {
 
   onSubmit(): void {
     this.loading = true;
-    this.error = '';
 
     const formData = new FormData();
     formData.append('firstName', this.firstName);
@@ -91,10 +92,11 @@ export class RegisterComponent {
 
     this.authService.register(formData).subscribe({
       next: () => {
+        this.toast.success('Kayıt başarılı.');
         this.router.navigate(['/meetings']);
       },
       error: (err) => {
-        this.error = err.error?.message || 'Kayıt başarısız.';
+        this.toast.error(getApiErrorMessage(err, 'Kayıt başarısız.'));
         this.loading = false;
       }
     });

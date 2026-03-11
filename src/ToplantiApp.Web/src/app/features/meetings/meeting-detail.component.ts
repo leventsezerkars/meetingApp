@@ -5,6 +5,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingDto, ParticipantDto } from '../../core/models/meeting.model';
 import { UserDto } from '../../core/models/auth.model';
+import { formatUtcToLocal } from '../../core/utils/date.utils';
+import { getApiErrorMessage } from '../../core/utils/api-error.utils';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-meeting-detail',
@@ -37,11 +40,11 @@ import { UserDto } from '../../core/models/auth.model';
               </div>
               <div class="row mb-2">
                 <div class="col-4 fw-bold">Başlangıç:</div>
-                <div class="col-8">{{ meeting.startDate | date:'dd.MM.yyyy HH:mm' }}</div>
+                <div class="col-8">{{ formatUtcToLocal(meeting.startDate) }}</div>
               </div>
               <div class="row mb-2">
                 <div class="col-4 fw-bold">Bitiş:</div>
-                <div class="col-8">{{ meeting.endDate | date:'dd.MM.yyyy HH:mm' }}</div>
+                <div class="col-8">{{ formatUtcToLocal(meeting.endDate) }}</div>
               </div>
               <div class="row mb-2">
                 <div class="col-4 fw-bold">Açıklama:</div>
@@ -160,11 +163,13 @@ export class MeetingDetailComponent implements OnInit {
   extName = '';
   extEmail = '';
   selectedFile: File | null = null;
+  readonly formatUtcToLocal = formatUtcToLocal;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private meetingService: MeetingService
+    private meetingService: MeetingService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -182,6 +187,7 @@ export class MeetingDetailComponent implements OnInit {
 
   copyLink(): void {
     navigator.clipboard.writeText(this.getMeetingUrl());
+    this.toast.success('Erişim linki kopyalandı.');
   }
 
   searchUsers(): void {
@@ -191,8 +197,13 @@ export class MeetingDetailComponent implements OnInit {
 
   addInternalParticipant(user: UserDto): void {
     this.meetingService.addParticipant(this.meeting!.id, { userId: user.id }).subscribe({
-      next: () => { this.loadMeeting(this.meeting!.id); this.searchResults = []; this.userSearch = ''; },
-      error: (err) => alert(err.error?.message || 'Hata')
+      next: () => {
+        this.toast.success('Katılımcı eklendi.');
+        this.loadMeeting(this.meeting!.id);
+        this.searchResults = [];
+        this.userSearch = '';
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'Hata'))
     });
   }
 
@@ -201,15 +212,25 @@ export class MeetingDetailComponent implements OnInit {
     this.meetingService.addParticipant(this.meeting!.id, {
       email: this.extEmail, fullName: this.extName
     }).subscribe({
-      next: () => { this.loadMeeting(this.meeting!.id); this.extName = ''; this.extEmail = ''; },
-      error: (err) => alert(err.error?.message || 'Hata')
+      next: () => {
+        this.toast.success('Katılımcı eklendi.');
+        this.loadMeeting(this.meeting!.id);
+        this.extName = '';
+        this.extEmail = '';
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'Hata'))
     });
   }
 
   removeParticipant(p: ParticipantDto): void {
     if (!confirm(`${p.fullName} katılımcısını silmek istiyor musunuz?`)) return;
-    this.meetingService.removeParticipant(this.meeting!.id, p.id)
-      .subscribe(() => this.loadMeeting(this.meeting!.id));
+    this.meetingService.removeParticipant(this.meeting!.id, p.id).subscribe({
+      next: () => {
+        this.toast.success('Katılımcı kaldırıldı.');
+        this.loadMeeting(this.meeting!.id);
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'Hata'))
+    });
   }
 
   onFileSelect(event: Event): void {
@@ -220,8 +241,12 @@ export class MeetingDetailComponent implements OnInit {
   uploadDocument(): void {
     if (!this.selectedFile || !this.meeting) return;
     this.meetingService.uploadDocument(this.meeting.id, this.selectedFile).subscribe({
-      next: () => { this.loadMeeting(this.meeting!.id); this.selectedFile = null; },
-      error: (err) => alert(err.error?.message || 'Yükleme başarısız.')
+      next: () => {
+        this.toast.success('Doküman yüklendi.');
+        this.loadMeeting(this.meeting!.id);
+        this.selectedFile = null;
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'Yükleme başarısız.'))
     });
   }
 
@@ -239,8 +264,11 @@ export class MeetingDetailComponent implements OnInit {
   cancelMeeting(): void {
     if (!confirm('Bu toplantıyı iptal etmek istiyor musunuz?')) return;
     this.meetingService.cancel(this.meeting!.id).subscribe({
-      next: () => this.loadMeeting(this.meeting!.id),
-      error: (err) => alert(err.error?.message || 'İptal başarısız.')
+      next: () => {
+        this.toast.success('Toplantı iptal edildi.');
+        this.loadMeeting(this.meeting!.id);
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'İptal başarısız.'))
     });
   }
 }

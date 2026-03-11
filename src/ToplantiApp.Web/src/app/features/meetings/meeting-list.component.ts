@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingListDto } from '../../core/models/meeting.model';
+import { formatUtcToLocal } from '../../core/utils/date.utils';
 
 @Component({
   selector: 'app-meeting-list',
@@ -35,8 +36,8 @@ import { MeetingListDto } from '../../core/models/meeting.model';
           @for (m of filteredMeetings; track m.id) {
             <tr>
               <td><a [routerLink]="['/meetings', m.id]">{{ m.name }}</a></td>
-              <td>{{ m.startDate | date:'dd.MM.yyyy HH:mm' }}</td>
-              <td>{{ m.endDate | date:'dd.MM.yyyy HH:mm' }}</td>
+              <td>{{ formatUtcToLocal(m.startDate) }}</td>
+              <td>{{ formatUtcToLocal(m.endDate) }}</td>
               <td>
                 <span [class]="m.status === 'Active' ? 'badge bg-success' : 'badge bg-danger'">
                   {{ m.status === 'Active' ? 'Aktif' : 'İptal' }}
@@ -67,6 +68,7 @@ import { MeetingListDto } from '../../core/models/meeting.model';
 export class MeetingListComponent implements OnInit {
   meetings: MeetingListDto[] = [];
   searchTerm = '';
+  readonly formatUtcToLocal = formatUtcToLocal;
 
   constructor(private meetingService: MeetingService) {}
 
