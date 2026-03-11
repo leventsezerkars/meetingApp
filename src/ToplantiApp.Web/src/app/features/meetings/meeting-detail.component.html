@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>{{ meeting.name }}</h2>
     <div class="d-flex gap-2">
-      @if (meeting.status === 'Active') {
+      @if (meeting.status === 0) {
         <a [routerLink]="['/meetings', meeting.id, 'edit']" class="btn btn-outline-primary">Düzenle</a>
         @if (isNotStarted(meeting.startDate)) {
           <button class="btn btn-outline-danger" (click)="deleteMeeting()">Sil</button>
@@ -21,8 +21,8 @@
           <div class="row mb-2">
             <div class="col-4 fw-bold">Durum:</div>
             <div class="col-8">
-              <span [class]="meeting.status === 'Active' ? 'badge bg-success' : 'badge bg-danger'">
-                {{ meeting.status === 'Active' ? 'Aktif' : 'İptal' }}
+              <span [class]="meeting.status === 0 ? 'badge bg-success' : 'badge bg-danger'">
+                {{ meeting.statusText }}
               </span>
             </div>
           </div>

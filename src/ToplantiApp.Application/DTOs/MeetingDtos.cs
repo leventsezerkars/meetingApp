@@ -19,7 +19,8 @@ public record MeetingDto
     public string? Description { get; init; }
     public DateTime StartDate { get; init; }
     public DateTime EndDate { get; init; }
-    public string Status { get; init; } = default!;
+    public int Status { get; init; }
+    public string StatusText { get; init; } = default!;
     public DateTime? CancelledAt { get; init; }
     public Guid AccessToken { get; init; }
     public string MeetingUrl { get; init; } = default!;
@@ -35,7 +36,8 @@ public record MeetingListDto
     public string Name { get; init; } = default!;
     public DateTime StartDate { get; init; }
     public DateTime EndDate { get; init; }
-    public string Status { get; init; } = default!;
+    public int Status { get; init; }
+    public string StatusText { get; init; } = default!;
     public int ParticipantCount { get; init; }
     public string CreatedByName { get; init; } = default!;
     public DateTime CreatedAt { get; init; }
@@ -48,7 +50,8 @@ public record MeetingRoomDto
     public string? Description { get; init; }
     public DateTime StartDate { get; init; }
     public DateTime EndDate { get; init; }
-    public string Status { get; init; } = default!;
+    public int Status { get; init; }
+    public string StatusText { get; init; } = default!;
     public string CreatedByName { get; init; } = default!;
     public List<ParticipantDto> Participants { get; init; } = [];
     public List<MeetingDocumentDto> Documents { get; init; } = [];

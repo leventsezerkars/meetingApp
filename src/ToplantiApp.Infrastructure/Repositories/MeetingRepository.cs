@@ -37,6 +37,8 @@ public class MeetingRepository : GenericRepository<Meeting>, IMeetingRepository
 
     public async Task<List<Meeting>> GetCancelledMeetingsOlderThanAsync(DateTime date)
         => await Query
+            .Include(m => m.Documents)
+            .Include(m => m.Participants)
             .Where(m => m.Status == MeetingStatus.Cancelled && m.CancelledAt.HasValue && m.CancelledAt.Value < date)
             .ToListAsync();
 }

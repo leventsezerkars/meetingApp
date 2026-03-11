@@ -21,7 +21,8 @@ export interface MeetingDto {
   description: string | null;
   startDate: string;
   endDate: string;
-  status: string;
+  status: number;
+  statusText: string;
   cancelledAt: string | null;
   accessToken: string;
   meetingUrl: string;
@@ -36,7 +37,8 @@ export interface MeetingListDto {
   name: string;
   startDate: string;
   endDate: string;
-  status: string;
+  status: number;
+  statusText: string;
   participantCount: number;
   createdByName: string;
   createdAt: string;
@@ -72,7 +74,8 @@ export interface MeetingRoomDto {
   description: string | null;
   startDate: string;
   endDate: string;
-  status: string;
+  status: number;
+  statusText: string;
   createdByName: string;
   participants: ParticipantDto[];
   documents: MeetingDocumentDto[];

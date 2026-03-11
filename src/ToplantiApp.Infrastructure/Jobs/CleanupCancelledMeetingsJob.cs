@@ -10,25 +10,29 @@ public class CleanupCancelledMeetingsJob : IJob
     private readonly IMeetingRepository _meetingRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
+    private readonly IMeetingParticipantRepository _participantRepository;
     private readonly ILogger<CleanupCancelledMeetingsJob> _logger;
 
     public CleanupCancelledMeetingsJob(
         IMeetingRepository meetingRepository,
         IUnitOfWork unitOfWork,
         IFileService fileService,
-        ILogger<CleanupCancelledMeetingsJob> logger)
+        ILogger<CleanupCancelledMeetingsJob> logger,
+        IMeetingParticipantRepository participantRepository
+        )
     {
         _meetingRepository = meetingRepository;
         _unitOfWork = unitOfWork;
         _fileService = fileService;
         _logger = logger;
+        _participantRepository = participantRepository;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("Iptal edilmis toplanti temizleme job'i basladi.");
 
-        var cutoffDate = DateTime.UtcNow.AddDays(-30);
+        var cutoffDate = DateTime.UtcNow.AddMinutes(-1);
         var cancelledMeetings = await _meetingRepository.GetCancelledMeetingsOlderThanAsync(cutoffDate);
 
         if (cancelledMeetings.Count == 0)
@@ -51,6 +55,11 @@ public class CleanupCancelledMeetingsJob : IJob
                 {
                     _logger.LogWarning(ex, "Dosya silinemedi: {FilePath}", doc.FilePath);
                 }
+            }
+
+            foreach (var par in meeting.Participants)
+            {
+                _participantRepository.Delete(par);
             }
 
             _meetingRepository.Delete(meeting);

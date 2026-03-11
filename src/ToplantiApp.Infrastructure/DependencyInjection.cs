@@ -38,7 +38,10 @@ public static class DependencyInjection
             q.AddTrigger(opts => opts
                 .ForJob(jobKey)
                 .WithIdentity("CleanupCancelledMeetings-trigger")
-                .WithCronSchedule("0 0 2 * * ?"));
+                .WithCronSchedule("0 0/1 * * * ?"));
+                //.WithSimpleSchedule(x => x
+                //    .WithIntervalInMinutes(intervalMinutes)
+                //    .RepeatForever()));
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
