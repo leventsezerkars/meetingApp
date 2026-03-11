@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingListDto } from '../../core/models/meeting.model';
 import { formatUtcToLocal } from '../../core/utils/date.utils';
@@ -70,16 +71,20 @@ export class MeetingListComponent implements OnInit {
   searchTerm = '';
   readonly formatUtcToLocal = formatUtcToLocal;
 
-  constructor(private meetingService: MeetingService) {}
+  constructor(
+    private meetingService: MeetingService,
+    private title: Title
+  ) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Toplantılar | Toplantı Yönetimi');
+    this.meetingService.getAll().subscribe(res => this.meetings = res.data);
+  }
 
   get filteredMeetings(): MeetingListDto[] {
     if (!this.searchTerm) return this.meetings;
     const term = this.searchTerm.toLowerCase();
     return this.meetings.filter(m =>
       m.name.toLowerCase().includes(term) || m.createdByName.toLowerCase().includes(term));
-  }
-
-  ngOnInit(): void {
-    this.meetingService.getAll().subscribe(res => this.meetings = res.data);
   }
 }

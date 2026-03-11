@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { ToastService } from '../../core/services/toast.service';
 import { getApiErrorMessage } from '../../core/utils/api-error.utils';
@@ -39,7 +40,7 @@ import { getApiErrorMessage } from '../../core/utils/api-error.utils';
     </form>
   `
 })
-export class MeetingCreateComponent {
+export class MeetingCreateComponent implements OnInit {
   name = '';
   description = '';
   startDate = '';
@@ -48,9 +49,14 @@ export class MeetingCreateComponent {
 
   constructor(
     private meetingService: MeetingService,
+    private title: Title,
     public router: Router,
     private toast: ToastService
   ) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Yeni Toplantı | Toplantı Yönetimi');
+  }
 
   onSubmit(): void {
     this.loading = true;

@@ -81,5 +81,7 @@ export interface MeetingRoomDto {
 export interface MeetingAccessResult {
   isAccessible: boolean;
   message: string | null;
+  messageDate: string | null;
+  messageDateLabel: string | null;
   meeting: MeetingRoomDto | null;
 }

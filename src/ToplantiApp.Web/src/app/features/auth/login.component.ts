@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { getApiErrorMessage } from '../../core/utils/api-error.utils';
@@ -37,7 +38,7 @@ import { getApiErrorMessage } from '../../core/utils/api-error.utils';
     </div>
   `
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   loading = false;
@@ -45,8 +46,13 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toast: ToastService
+    private toast: ToastService,
+    private title: Title
   ) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Giriş Yap | Toplantı Yönetimi');
+  }
 
   onSubmit(): void {
     this.loading = true;

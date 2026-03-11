@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingDto, ParticipantDto } from '../../core/models/meeting.model';
 import { UserDto } from '../../core/models/auth.model';
@@ -53,7 +54,7 @@ import { ToastService } from '../../core/services/toast.service';
               <div class="row mb-2">
                 <div class="col-4 fw-bold">Erişim Linki:</div>
                 <div class="col-8">
-                  <code class="small">{{ getMeetingUrl() }}</code>
+                  <a [href]="getMeetingUrl()" target="_blank" rel="noopener noreferrer" class="small">{{ getMeetingUrl() }}</a>
                   <button class="btn btn-sm btn-outline-secondary ms-2" (click)="copyLink()">Kopyala</button>
                 </div>
               </div>
@@ -154,6 +155,27 @@ import { ToastService } from '../../core/services/toast.service';
         </div>
       </div>
     }
+
+    @if (showCancelConfirm) {
+      <div class="modal-backdrop show" (click)="closeCancelConfirm()"></div>
+      <div class="modal show d-block" tabindex="-1" style="background: transparent;">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h5 class="modal-title">Toplantıyı İptal Et</h5>
+              <button type="button" class="btn-close" (click)="closeCancelConfirm()"></button>
+            </div>
+            <div class="modal-body">
+              Bu toplantıyı iptal etmek istediğinize emin misiniz?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeCancelConfirm()">Hayır</button>
+              <button type="button" class="btn btn-danger" (click)="confirmCancel()">Evet, İptal Et</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   `
 })
 export class MeetingDetailComponent implements OnInit {
@@ -163,22 +185,28 @@ export class MeetingDetailComponent implements OnInit {
   extName = '';
   extEmail = '';
   selectedFile: File | null = null;
+  showCancelConfirm = false;
   readonly formatUtcToLocal = formatUtcToLocal;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private meetingService: MeetingService,
-    private toast: ToastService
+    private toast: ToastService,
+    private title: Title
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('Toplantı Detayı | Toplantı Yönetimi');
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadMeeting(id);
   }
 
   loadMeeting(id: number): void {
-    this.meetingService.getById(id).subscribe(res => this.meeting = res.data);
+    this.meetingService.getById(id).subscribe(res => {
+      this.meeting = res.data;
+      if (this.meeting) this.title.setTitle(this.meeting.name + ' | Toplantı Yönetimi');
+    });
   }
 
   getMeetingUrl(): string {
@@ -262,9 +290,18 @@ export class MeetingDetailComponent implements OnInit {
   }
 
   cancelMeeting(): void {
-    if (!confirm('Bu toplantıyı iptal etmek istiyor musunuz?')) return;
-    this.meetingService.cancel(this.meeting!.id).subscribe({
+    this.showCancelConfirm = true;
+  }
+
+  closeCancelConfirm(): void {
+    this.showCancelConfirm = false;
+  }
+
+  confirmCancel(): void {
+    if (!this.meeting) return;
+    this.meetingService.cancel(this.meeting.id).subscribe({
       next: () => {
+        this.showCancelConfirm = false;
         this.toast.success('Toplantı iptal edildi.');
         this.loadMeeting(this.meeting!.id);
       },

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingAccessResult } from '../../core/models/meeting.model';
 import { formatUtcToLocal } from '../../core/utils/date.utils';
@@ -26,7 +27,9 @@ import { ToastService } from '../../core/services/toast.service';
               <div class="card-body text-center p-5">
                 <h1 class="display-1 text-danger">⛔</h1>
                 <h3 class="text-danger">Erişim Engellendi</h3>
-                <p class="text-muted mt-3">{{ result.message }}</p>
+                <p class="text-muted mt-3">
+                  {{ result.message }}{{ result.messageDate && result.messageDateLabel ? ' ' + result.messageDateLabel + ': ' + formatUtcToLocal(result.messageDate) : '' }}
+                </p>
               </div>
             </div>
           </div>
@@ -63,7 +66,10 @@ import { ToastService } from '../../core/services/toast.service';
               <h5>Dokümanlar</h5>
               <ul class="list-group">
                 @for (doc of result.meeting.documents; track doc.id) {
-                  <li class="list-group-item">{{ doc.originalFileName }}</li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ doc.originalFileName }}</span>
+                    <button class="btn btn-sm btn-outline-primary" (click)="downloadDoc(doc.id)">İndir</button>
+                  </li>
                 }
               </ul>
             }
@@ -90,10 +96,12 @@ export class MeetingRoomComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private meetingService: MeetingService,
-    private toast: ToastService
+    private toast: ToastService,
+    private title: Title
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('Toplantı Odası | Toplantı Yönetimi');
     const token = this.route.snapshot.paramMap.get('accessToken')!;
     this.meetingService.getMeetingRoom(token).subscribe({
       next: (res) => { this.result = res.data; this.loading = false; },
@@ -106,6 +114,21 @@ export class MeetingRoomComponent implements OnInit {
         }
         this.loading = false;
       }
+    });
+  }
+
+  downloadDoc(docId: number): void {
+    if (!this.result?.meeting) return;
+    this.meetingService.downloadDocument(this.result.meeting.id, docId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'İndirme başarısız.'))
     });
   }
 }
