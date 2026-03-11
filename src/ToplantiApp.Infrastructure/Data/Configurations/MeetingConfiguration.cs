@@ -34,6 +34,9 @@ public class MeetingConfiguration : IEntityTypeConfiguration<Meeting>
         builder.HasIndex(m => m.AccessToken)
             .IsUnique();
 
+        builder.Property(m => m.CreatedByUserId)
+            .IsRequired();
+
         builder.HasOne(m => m.CreatedBy)
             .WithMany(u => u.CreatedMeetings)
             .HasForeignKey(m => m.CreatedByUserId)
