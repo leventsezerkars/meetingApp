@@ -58,5 +58,7 @@ public record MeetingAccessResultDto
 {
     public bool IsAccessible { get; init; }
     public string? Message { get; init; }
+    public DateTime? MessageDate { get; init; }
+    public string? MessageDateLabel { get; init; }
     public MeetingRoomDto? Meeting { get; init; }
 }

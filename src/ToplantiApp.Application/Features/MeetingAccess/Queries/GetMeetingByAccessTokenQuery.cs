@@ -36,11 +36,19 @@ public class GetMeetingByAccessTokenQueryHandler : IRequestHandler<GetMeetingByA
             return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto
             {
                 IsAccessible = false,
-                Message = $"Toplantı henüz başlamadı. Başlangıç: {meeting.StartDate:dd.MM.yyyy HH:mm}"
+                Message = "Toplantı henüz başlamadı.",
+                MessageDate = meeting.StartDate,
+                MessageDateLabel = "Başlangıç"
             });
 
         if (now > meeting.EndDate)
-            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = false, Message = "Toplantı sona ermiştir." });
+            return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto
+            {
+                IsAccessible = false,
+                Message = "Toplantı sona ermiştir.",
+                MessageDate = meeting.EndDate,
+                MessageDateLabel = "Bitiş"
+            });
 
         var meetingRoom = _mapper.Map<MeetingRoomDto>(meeting);
         return Response<MeetingAccessResultDto>.Ok(new MeetingAccessResultDto { IsAccessible = true, Meeting = meetingRoom });
