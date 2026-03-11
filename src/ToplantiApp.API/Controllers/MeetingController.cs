@@ -57,4 +57,11 @@ public class MeetingController : ControllerBase
         var result = await _mediator.Send(new CancelMeetingCommand(id, GetUserId()));
         return Ok(result);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<Response>> Delete(int id)
+    {
+        var result = await _mediator.Send(new DeleteMeetingCommand(id, GetUserId()));
+        return Ok(result);
+    }
 }
