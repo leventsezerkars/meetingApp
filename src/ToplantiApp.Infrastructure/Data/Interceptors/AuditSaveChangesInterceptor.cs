@@ -1,11 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Domain.Entities;
 
 namespace ToplantiApp.Infrastructure.Data.Interceptors;
 
 public class AuditSaveChangesInterceptor : SaveChangesInterceptor
 {
+    private readonly ICurrentUserProvider _currentUserProvider;
+
+    public AuditSaveChangesInterceptor(ICurrentUserProvider currentUserProvider)
+    {
+        _currentUserProvider = currentUserProvider;
+    }
+
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -27,8 +35,9 @@ public class AuditSaveChangesInterceptor : SaveChangesInterceptor
         return base.SavingChanges(eventData, result);
     }
 
-    private static void UpdateAuditFields(DbContext context)
+    private void UpdateAuditFields(DbContext context)
     {
+        var userId = _currentUserProvider.GetCurrentUserId();
         var entries = context.ChangeTracker.Entries<BaseEntity>();
 
         foreach (var entry in entries)
@@ -36,6 +45,14 @@ public class AuditSaveChangesInterceptor : SaveChangesInterceptor
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
+                if (userId.HasValue)
+                    entry.Entity.CreatedByUserId = userId;
+            }
+            else if (entry.State == EntityState.Modified && entry.Entity is AuditableEntity auditable)
+            {
+                auditable.UpdatedAt = DateTime.UtcNow;
+                if (userId.HasValue)
+                    auditable.UpdatedByUserId = userId;
             }
         }
     }

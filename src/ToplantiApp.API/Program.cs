@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ToplantiApp.API.Middleware;
+using ToplantiApp.API.Services;
 using ToplantiApp.Application;
+using ToplantiApp.Application.Common;
 using ToplantiApp.Infrastructure;
 using ToplantiApp.Infrastructure.Data;
 using ToplantiApp.Infrastructure.Data.Migrations;
@@ -12,6 +14,8 @@ using ToplantiApp.Infrastructure.Data.Migrations;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<ICurrentUserProvider, CurrentUserProvider>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
