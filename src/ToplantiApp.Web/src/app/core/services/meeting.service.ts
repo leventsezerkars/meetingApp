@@ -37,6 +37,10 @@ export class MeetingService {
     return this.http.put<ApiResponse>(`${this.apiUrl}/${id}/cancel`, {});
   }
 
+  delete(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}`);
+  }
+
   addParticipant(meetingId: number, data: AddParticipantDto): Observable<ApiResponse<ParticipantDto>> {
     return this.http.post<ApiResponse<ParticipantDto>>(
       `${environment.apiUrl}/meetings/${meetingId}/participants`, data);

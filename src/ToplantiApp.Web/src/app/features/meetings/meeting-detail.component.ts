@@ -20,6 +20,9 @@ import { ToastService } from '../../core/services/toast.service';
         <div class="d-flex gap-2">
           @if (meeting.status === 'Active') {
             <a [routerLink]="['/meetings', meeting.id, 'edit']" class="btn btn-outline-primary">Düzenle</a>
+            @if (isNotStarted(meeting.startDate)) {
+              <button class="btn btn-outline-danger" (click)="deleteMeeting()">Sil</button>
+            }
             <button class="btn btn-outline-danger" (click)="cancelMeeting()">İptal Et</button>
           }
           <a routerLink="/meetings" class="btn btn-secondary">Geri</a>
@@ -176,6 +179,27 @@ import { ToastService } from '../../core/services/toast.service';
         </div>
       </div>
     }
+
+    @if (showDeleteConfirm) {
+      <div class="modal-backdrop show" (click)="closeDeleteConfirm()"></div>
+      <div class="modal show d-block" tabindex="-1" style="background: transparent;">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h5 class="modal-title">Toplantıyı Sil</h5>
+              <button type="button" class="btn-close" (click)="closeDeleteConfirm()"></button>
+            </div>
+            <div class="modal-body">
+              Bu toplantıyı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeDeleteConfirm()">Hayır</button>
+              <button type="button" class="btn btn-danger" (click)="confirmDelete()">Evet, Sil</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   `
 })
 export class MeetingDetailComponent implements OnInit {
@@ -186,6 +210,7 @@ export class MeetingDetailComponent implements OnInit {
   extEmail = '';
   selectedFile: File | null = null;
   showCancelConfirm = false;
+  showDeleteConfirm = false;
   readonly formatUtcToLocal = formatUtcToLocal;
 
   constructor(
@@ -286,6 +311,33 @@ export class MeetingDetailComponent implements OnInit {
       a.download = '';
       a.click();
       window.URL.revokeObjectURL(url);
+    });
+  }
+
+  isNotStarted(startDate: string): boolean {
+    return new Date(startDate) > new Date();
+  }
+
+  deleteMeeting(): void {
+    this.showDeleteConfirm = true;
+  }
+
+  closeDeleteConfirm(): void {
+    this.showDeleteConfirm = false;
+  }
+
+  confirmDelete(): void {
+    if (!this.meeting) return;
+    this.meetingService.delete(this.meeting.id).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.toast.success('Toplantı silindi.');
+        this.router.navigate(['/meetings']);
+      },
+      error: (err) => {
+        this.showDeleteConfirm = false;
+        this.toast.error(getApiErrorMessage(err, 'Silme başarısız.'));
+      }
     });
   }
 

@@ -6,6 +6,8 @@ import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingListDto } from '../../core/models/meeting.model';
 import { formatUtcToLocal } from '../../core/utils/date.utils';
+import { ToastService } from '../../core/services/toast.service';
+import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 
 @Component({
   selector: 'app-meeting-list',
@@ -49,7 +51,10 @@ import { formatUtcToLocal } from '../../core/utils/date.utils';
               <td>
                 <a [routerLink]="['/meetings', m.id]" class="btn btn-sm btn-outline-primary me-1">Detay</a>
                 @if (m.status === 'Active') {
-                  <a [routerLink]="['/meetings', m.id, 'edit']" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                  <a [routerLink]="['/meetings', m.id, 'edit']" class="btn btn-sm btn-outline-secondary me-1">Düzenle</a>
+                  @if (isNotStarted(m.startDate)) {
+                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteMeeting(m)">Sil</button>
+                  }
                 }
               </td>
             </tr>
@@ -73,8 +78,24 @@ export class MeetingListComponent implements OnInit {
 
   constructor(
     private meetingService: MeetingService,
-    private title: Title
+    private title: Title,
+    private toast: ToastService
   ) {}
+
+  isNotStarted(startDate: string): boolean {
+    return new Date(startDate) > new Date();
+  }
+
+  deleteMeeting(m: MeetingListDto): void {
+    if (!confirm(`"${m.name}" toplantısını kalıcı olarak silmek istiyor musunuz?`)) return;
+    this.meetingService.delete(m.id).subscribe({
+      next: () => {
+        this.toast.success('Toplantı silindi.');
+        this.meetingService.getAll().subscribe(res => this.meetings = res.data);
+      },
+      error: (err) => this.toast.error(getApiErrorMessage(err, 'Silme başarısız.'))
+    });
+  }
 
   ngOnInit(): void {
     this.title.setTitle('Toplantılar | Toplantı Yönetimi');
