@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
 using ToplantiApp.Domain.Enums;
@@ -11,7 +12,7 @@ using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Participants.Commands;
 
-public record AddParticipantCommand(int MeetingId, AddParticipantDto Data, int UserId) : IRequest<Response<ParticipantDto>>;
+public record AddParticipantCommand(int MeetingId, AddParticipantDto Data) : IRequest<Response<ParticipantDto>>;
 
 public class AddParticipantCommandValidator : AbstractValidator<AddParticipantCommand>
 {
@@ -32,6 +33,7 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
     private readonly IMailService _mailService;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
+    private readonly ICurrentUserProvider _currentUser;
 
     public AddParticipantCommandHandler(
         IMeetingRepository meetingRepository,
@@ -40,7 +42,8 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         IUnitOfWork unitOfWork,
         IMailService mailService,
         IMapper mapper,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ICurrentUserProvider currentUser)
     {
         _meetingRepository = meetingRepository;
         _userRepository = userRepository;
@@ -49,14 +52,16 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         _mailService = mailService;
         _mapper = mapper;
         _configuration = configuration;
+        _currentUser = currentUser;
     }
 
     public async Task<Response<ParticipantDto>> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
     {
+        var userId = _currentUser.GetCurrentUserId() ?? throw new UnauthorizedAccessException("Kullanici kimligi alinamadi.");
         var meeting = await _meetingRepository.GetByIdWithDetailsAsync(request.MeetingId)
             ?? throw new NotFoundException("Toplanti", request.MeetingId);
 
-        if (meeting.CreatedByUserId != request.UserId)
+        if (meeting.CreatedByUserId != userId)
             throw new ForbiddenException("Bu toplantiya katilimci ekleme yetkiniz yok.");
 
         MeetingParticipant participant;

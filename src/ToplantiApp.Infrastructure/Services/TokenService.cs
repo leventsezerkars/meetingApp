@@ -36,7 +36,7 @@ public class TokenService : ITokenService
             audience: _configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddHours(
-                double.Parse(_configuration["Jwt:ExpireHours"] ?? "24")),
+                double.Parse(_configuration["Jwt:ExpireHours"] ?? "1")),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

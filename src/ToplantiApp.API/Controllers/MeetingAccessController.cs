@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ToplantiApp.Application.Common;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.MeetingAccess.Queries;
 

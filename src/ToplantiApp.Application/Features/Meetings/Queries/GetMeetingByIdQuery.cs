@@ -1,7 +1,7 @@
 using AutoMapper;
 using MediatR;
-using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Interfaces;
 

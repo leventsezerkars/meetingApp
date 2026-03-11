@@ -1,4 +1,4 @@
-namespace ToplantiApp.Application.Common;
+namespace ToplantiApp.Application.Common.Models;
 
 public class PaginatedResponse<T> : Response<List<T>>
 {

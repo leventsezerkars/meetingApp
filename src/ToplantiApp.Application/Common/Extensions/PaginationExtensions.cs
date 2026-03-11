@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using ToplantiApp.Application.Common.Models;
 
-namespace ToplantiApp.Application.Common;
+namespace ToplantiApp.Application.Common.Extensions;
 
 public static class PaginationExtensions
 {

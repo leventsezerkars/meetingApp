@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FluentValidation;
-using ToplantiApp.Application.Common;
 using ToplantiApp.Application.Common.Exceptions;
+using ToplantiApp.Application.Common.Models;
 
 namespace ToplantiApp.API.Middleware;
 

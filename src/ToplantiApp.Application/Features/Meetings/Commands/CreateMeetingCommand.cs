@@ -1,14 +1,14 @@
 using AutoMapper;
 using FluentValidation;
 using MediatR;
-using ToplantiApp.Application.Common;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Domain.Entities;
 using ToplantiApp.Domain.Interfaces;
 
 namespace ToplantiApp.Application.Features.Meetings.Commands;
 
-public record CreateMeetingCommand(CreateMeetingDto Data, int UserId) : IRequest<Response<MeetingDto>>;
+public record CreateMeetingCommand(CreateMeetingDto Data) : IRequest<Response<MeetingDto>>;
 
 public class CreateMeetingCommandValidator : AbstractValidator<CreateMeetingCommand>
 {
@@ -41,7 +41,6 @@ public class CreateMeetingCommandHandler : IRequestHandler<CreateMeetingCommand,
             Description = request.Data.Description,
             StartDate = request.Data.StartDate,
             EndDate = request.Data.EndDate,
-            CreatedByUserId = request.UserId,
             AccessToken = Guid.NewGuid()
         };
 

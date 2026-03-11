@@ -1,8 +1,7 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToplantiApp.Application.Common;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.Participants.Commands;
 using ToplantiApp.Application.Features.Participants.Queries;
@@ -21,19 +20,17 @@ public class MeetingParticipantController : ControllerBase
         _mediator = mediator;
     }
 
-    private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
     [HttpPost]
     public async Task<ActionResult<Response<ParticipantDto>>> Add(int meetingId, [FromBody] AddParticipantDto data)
     {
-        var result = await _mediator.Send(new AddParticipantCommand(meetingId, data, GetUserId()));
+        var result = await _mediator.Send(new AddParticipantCommand(meetingId, data));
         return Ok(result);
     }
 
     [HttpDelete("{participantId}")]
     public async Task<ActionResult<Response>> Remove(int meetingId, int participantId)
     {
-        var result = await _mediator.Send(new RemoveParticipantCommand(meetingId, participantId, GetUserId()));
+        var result = await _mediator.Send(new RemoveParticipantCommand(meetingId, participantId));
         return Ok(result);
     }
 

@@ -1,8 +1,7 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToplantiApp.Application.Common;
+using ToplantiApp.Application.Common.Models;
 using ToplantiApp.Application.DTOs;
 using ToplantiApp.Application.Features.Meetings.Commands;
 using ToplantiApp.Application.Features.Meetings.Queries;
@@ -21,12 +20,10 @@ public class MeetingController : ControllerBase
         _mediator = mediator;
     }
 
-    private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
     [HttpGet]
     public async Task<ActionResult<PaginatedResponse<MeetingListDto>>> GetAll([FromQuery] PaginationRequest pagination)
     {
-        var result = await _mediator.Send(new GetMeetingsQuery(GetUserId(), pagination));
+        var result = await _mediator.Send(new GetMeetingsQuery(pagination));
         return Ok(result);
     }
 
@@ -40,28 +37,28 @@ public class MeetingController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Response<MeetingDto>>> Create([FromBody] CreateMeetingDto data)
     {
-        var result = await _mediator.Send(new CreateMeetingCommand(data, GetUserId()));
+        var result = await _mediator.Send(new CreateMeetingCommand(data));
         return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<Response<MeetingDto>>> Update(int id, [FromBody] UpdateMeetingDto data)
     {
-        var result = await _mediator.Send(new UpdateMeetingCommand(id, data, GetUserId()));
+        var result = await _mediator.Send(new UpdateMeetingCommand(id, data));
         return Ok(result);
     }
 
     [HttpPut("{id}/cancel")]
     public async Task<ActionResult<Response>> Cancel(int id)
     {
-        var result = await _mediator.Send(new CancelMeetingCommand(id, GetUserId()));
+        var result = await _mediator.Send(new CancelMeetingCommand(id));
         return Ok(result);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult<Response>> Delete(int id)
     {
-        var result = await _mediator.Send(new DeleteMeetingCommand(id, GetUserId()));
+        var result = await _mediator.Send(new DeleteMeetingCommand(id));
         return Ok(result);
     }
 }
