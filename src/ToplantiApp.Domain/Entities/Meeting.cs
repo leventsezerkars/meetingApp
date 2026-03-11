@@ -2,7 +2,7 @@ using ToplantiApp.Domain.Enums;
 
 namespace ToplantiApp.Domain.Entities;
 
-public class Meeting : BaseEntity
+public class Meeting : AuditableEntity
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
@@ -12,7 +12,6 @@ public class Meeting : BaseEntity
     public DateTime? CancelledAt { get; set; }
     public Guid AccessToken { get; set; } = Guid.NewGuid();
 
-    public int CreatedByUserId { get; set; }
     public User CreatedBy { get; set; } = null!;
 
     public ICollection<MeetingParticipant> Participants { get; set; } = new List<MeetingParticipant>();

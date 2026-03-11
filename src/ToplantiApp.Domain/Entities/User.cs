@@ -1,6 +1,6 @@
 namespace ToplantiApp.Domain.Entities;
 
-public class User : BaseEntity
+public class User : AuditableEntity
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
