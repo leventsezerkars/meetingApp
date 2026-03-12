@@ -108,6 +108,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseDefaultFiles(); // "/" isteğinde wwwroot/index.html döner
 app.UseStaticFiles();
 app.UseCors("AllowAngular");
 
@@ -115,5 +116,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// SPA: API'ye ait olmayan path'lerde index.html döndür (Angular client-side routing)
+app.MapFallbackToFile("index.html");
 
 app.Run();

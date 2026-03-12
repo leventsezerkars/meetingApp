@@ -22,7 +22,7 @@ RUN dotnet publish src/ToplantiApp.API/ToplantiApp.API.csproj -c Release -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=api-build /app/publish .
-COPY --from=angular-build /app/web/dist/toplanti-app.web/browser ./wwwroot
+COPY --from=angular-build /app/web/dist/ToplantiApp.Web/browser ./wwwroot
 
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
