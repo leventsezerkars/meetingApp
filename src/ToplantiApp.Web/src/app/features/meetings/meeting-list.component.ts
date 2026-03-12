@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingListDto } from '../../core/models/meeting.model';
-import { formatUtcToLocal } from '../../core/utils/date.utils';
+import { formatUtcToLocal, isMeetingNotStarted } from '../../core/utils/date.utils';
 import { ToastService } from '../../core/services/toast.service';
 import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 
@@ -18,16 +18,13 @@ export class MeetingListComponent implements OnInit {
   meetings: MeetingListDto[] = [];
   searchTerm = '';
   readonly formatUtcToLocal = formatUtcToLocal;
+  readonly isMeetingNotStarted = isMeetingNotStarted;
 
   constructor(
     private meetingService: MeetingService,
     private title: Title,
     private toast: ToastService
   ) {}
-
-  isNotStarted(startDate: string): boolean {
-    return new Date(startDate) > new Date();
-  }
 
   deleteMeeting(m: MeetingListDto): void {
     if (!confirm(`"${m.name}" toplantısını kalıcı olarak silmek istiyor musunuz?`)) return;

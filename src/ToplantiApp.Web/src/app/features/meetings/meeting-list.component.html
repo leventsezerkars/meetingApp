@@ -27,7 +27,7 @@
           <td>{{ formatUtcToLocal(m.startDate) }}</td>
           <td>{{ formatUtcToLocal(m.endDate) }}</td>
           <td>
-            <span [class]="m.status === 0 ? 'badge bg-success' : 'badge bg-danger'">
+            <span [class]="m.status === 0 ? (isMeetingNotStarted(m.startDate) ? 'badge bg-warning' : 'badge bg-primary') : 'badge bg-danger'">
               {{ m.statusText }}
             </span>
           </td>
@@ -37,7 +37,7 @@
             <a [routerLink]="['/meetings', m.id]" class="btn btn-sm btn-outline-primary me-1">Detay</a>
             @if (m.status === 0) {
               <a [routerLink]="['/meetings', m.id, 'edit']" class="btn btn-sm btn-outline-secondary me-1">Düzenle</a>
-              @if (isNotStarted(m.startDate)) {
+              @if (isMeetingNotStarted(m.startDate)) {
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteMeeting(m)">Sil</button>
               }
             }

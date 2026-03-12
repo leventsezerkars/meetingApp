@@ -6,7 +6,7 @@ import { Title } from '@angular/platform-browser';
 import { MeetingService } from '../../core/services/meeting.service';
 import { MeetingDto, ParticipantDto } from '../../core/models/meeting.model';
 import { UserDto } from '../../core/models/auth.model';
-import { formatUtcToLocal } from '../../core/utils/date.utils';
+import { formatUtcToLocal, isMeetingNotStarted } from '../../core/utils/date.utils';
 import { getApiErrorMessage } from '../../core/utils/api-error.utils';
 import { ToastService } from '../../core/services/toast.service';
 
@@ -25,6 +25,7 @@ export class MeetingDetailComponent implements OnInit {
   showCancelConfirm = false;
   showDeleteConfirm = false;
   readonly formatUtcToLocal = formatUtcToLocal;
+  readonly isMeetingNotStarted = isMeetingNotStarted;
 
   constructor(
     private route: ActivatedRoute,
@@ -125,10 +126,6 @@ export class MeetingDetailComponent implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
     });
-  }
-
-  isNotStarted(startDate: string): boolean {
-    return new Date(startDate) > new Date();
   }
 
   deleteMeeting(): void {

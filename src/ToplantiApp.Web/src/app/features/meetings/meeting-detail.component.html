@@ -4,10 +4,10 @@
     <div class="d-flex gap-2">
       @if (meeting.status === 0) {
         <a [routerLink]="['/meetings', meeting.id, 'edit']" class="btn btn-outline-primary">Düzenle</a>
-        @if (isNotStarted(meeting.startDate)) {
+        @if (isMeetingNotStarted(meeting.startDate)) {
           <button class="btn btn-outline-danger" (click)="deleteMeeting()">Sil</button>
+          <button class="btn btn-outline-danger" (click)="cancelMeeting()">İptal Et</button>
         }
-        <button class="btn btn-outline-danger" (click)="cancelMeeting()">İptal Et</button>
       }
       <a routerLink="/meetings" class="btn btn-secondary">Geri</a>
     </div>
@@ -21,7 +21,7 @@
           <div class="row mb-2">
             <div class="col-4 fw-bold">Durum:</div>
             <div class="col-8">
-              <span [class]="meeting.status === 0 ? 'badge bg-success' : 'badge bg-danger'">
+              <span [class]="meeting.status === 0 ? (isMeetingNotStarted(meeting.startDate) ? 'badge bg-warning' : 'badge bg-primary') : 'badge bg-danger'">
                 {{ meeting.statusText }}
               </span>
             </div>

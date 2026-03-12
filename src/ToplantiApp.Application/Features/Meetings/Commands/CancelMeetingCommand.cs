@@ -36,8 +36,12 @@ public class CancelMeetingCommandHandler : IRequestHandler<CancelMeetingCommand,
         if (meeting.Status == MeetingStatus.Cancelled)
             throw new AppException("Bu toplanti zaten iptal edilmis.");
 
+        var now = DateTime.UtcNow;
+        if (meeting.StartDate <= now)
+            throw new AppException("Baslamis veya bitmis toplantilar iptal edilemez.");
+
         meeting.Status = MeetingStatus.Cancelled;
-        meeting.CancelledAt = DateTime.UtcNow;
+        meeting.CancelledAt = now;
 
         _meetingRepository.Update(meeting);
         await _unitOfWork.SaveChangesAsync();
