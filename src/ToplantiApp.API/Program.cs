@@ -95,9 +95,30 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-    db.ApplyTriggerMigrations();
+    try
+    {
+        logger.LogInformation("Veritabani migration calistiriliyor...");
+        db.Database.Migrate();
+        logger.LogInformation("Migration tamamlandi.");
+    }
+    catch (Exception ex)
+    {
+        var inner = ex.InnerException?.Message ?? ex.Message;
+        logger.LogError(ex, "Veritabani migration basarisiz. Uygulama kapaniyor. Hata: {Message}", inner);
+        throw;
+    }
+
+    try
+    {
+        db.ApplyTriggerMigrations();
+        logger.LogInformation("Trigger migration tamamlandi.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Trigger migration atlandi (trigger zaten mevcut veya SQL hatasi). Uygulama devam ediyor.");
+    }
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
@@ -116,6 +137,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Docker/load balancer icin basit canlilik kontrolu (veritabani bagimliligi yok)
+app.MapGet("/health", () => Results.Ok("OK")).AllowAnonymous();
 
 // SPA: API'ye ait olmayan path'lerde index.html döndür (Angular client-side routing)
 app.MapFallbackToFile("index.html");

@@ -12,8 +12,8 @@ using ToplantiApp.Infrastructure.Data;
 namespace ToplantiApp.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260311023525_RemoveUpdateAuditFromParticipantAndDocument")]
-    partial class RemoveUpdateAuditFromParticipantAndDocument
+    [Migration("20260312145520_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,8 @@ namespace ToplantiApp.Infrastructure.Data.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.ToTable("Meeting", (string)null);
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ToplantiApp.Domain.Entities.MeetingDocument", b =>

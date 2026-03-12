@@ -74,6 +74,8 @@ namespace ToplantiApp.Infrastructure.Data.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.ToTable("Meeting", (string)null);
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ToplantiApp.Domain.Entities.MeetingDocument", b =>

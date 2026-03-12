@@ -139,6 +139,7 @@ docker-compose içinde API için kullanılan değişkenler:
 | `Mail__SecureSocketOptions` | TLS: `StartTls` veya `None` (Mailpit için None) | None |
 | `Mail__From` | Gönderen adresi (görünen) | noreply@toplanti.app |
 | `Mail__Username` / `Mail__Password` | SMTP kimlik (Mailpit’te boş bırakılır) | — |
+| `TZ` | Konteyner saat dilimi (API tarafında `DateTime.Now` vb. için) | `Europe/Istanbul` (GMT+3). Değiştirmek için [IANA timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) adı kullanın (örn. `America/New_York`). |
 
 Şifre ve JWT key’i production’da güvenli bir yöntemle (örn. secret/store) yönetilmelidir.
 
@@ -168,6 +169,15 @@ Hata almıyorsanız Docker hazırdır.
 docker compose down
 docker system prune -f
 ```
+
+**Migration’ları sıfırladıysanız veya “Veritabani migration basarisiz” hatası alıyorsanız:** Eski veritabanı ve migration geçmişi volume’da kalmış olabilir. Volume’ları da silip veritabanını sıfırdan oluşturun:
+
+```powershell
+docker compose down -v
+docker compose up --build
+```
+
+(`-v` ile `mssql_data` volume silinir; ilk açılışta tek migration temiz uygulanır.)
 
 ### Adım 4: Build ve çalıştırma
 
@@ -226,6 +236,8 @@ docker compose down
 | Port 5000 veya 1433 kullanımda | Başka bir uygulama aynı portu kullanıyor | `docker-compose.yml` içinde `ports` bölümünde farklı port kullanın (örn. `"5001:8080"`). |
 | MSSQL healthcheck sürekli başarısız | Bazı 2022 imajlarında `sqlcmd` yolu yok veya farklı | Healthcheck bloğunu geçici kaldırın veya imajı sabitleyin: `mcr.microsoft.com/mssql/server:2022-cu16-ubuntu-22.04`. API yine `depends_on: mssql` ile bekler; gerekirse `restart: on-failure` sayesinde birkaç denemede bağlanır. |
 | API “connection refused” / migration hatası | API, SQL Server tam açılmadan başlamış | Birkaç saniye bekleyip `docker compose restart api` deneyin veya `docker compose up --build` ile yeniden başlatın. |
+| localhost:5000 açılmıyor | API konteyneri migration/trigger hatasında çöküyor olabilir | `docker compose ps` ve `docker compose logs api` ile durum ve hata mesajını inceleyin. |
+| **Veritabani migration basarisiz. Uygulama kapaniyor.** | Eski migration geçmişi volume’da kalmış; tablolar zaten var veya migration ID uyumsuz | `docker compose down -v` ile volume’ları silin, ardından `docker compose up --build`. Log’daki “Hata: …” satırına bakarak da nedeni görebilirsiniz. |
 | Angular sayfası 404 veya boş | wwwroot’a Angular çıktısı gelmemiş | Dockerfile’daki path’in `dist/ToplantiApp.Web/browser` olduğundan ve `angular.json`’daki proje adının `ToplantiApp.Web` ile uyumlu olduğundan emin olun. |
 | Build sırasında “solution not found” | Solution dosyası adı/konumu | Kök dizinde `ToplantiCaseApp.slnx` dosyasının bulunduğundan emin olun; Dockerfile’da aynı isim kullanılır. |
 

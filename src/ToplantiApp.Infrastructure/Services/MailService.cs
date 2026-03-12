@@ -29,7 +29,7 @@ public class MailService : IMailService
             <br/>
             <p>İyi günler dileriz.</p>";
 
-        await SendEmailAsync(user.Email, subject, body);
+        await SendEmailAsync(user.Email, subject, body, fromAddress: null);
     }
 
     public async Task SendMeetingInvitationAsync(string toEmail, string participantName, Meeting meeting, string meetingUrl)
@@ -48,7 +48,8 @@ public class MailService : IMailService
             <p><a href='{meetingUrl}' style='background:#0d6efd;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Toplantıya Katıl</a></p>
             <p><small>Bu linke sadece toplantı saatleri içinde erişebilirsiniz.</small></p>";
 
-        await SendEmailAsync(toEmail, subject, body);
+        var fromAddress = meeting.CreatedBy?.Email;
+        await SendEmailAsync(toEmail, subject, body, fromAddress);
     }
 
     public async Task SendMeetingNotificationAsync(string toEmail, string participantName, Meeting meeting, string subject, string message)
@@ -59,30 +60,45 @@ public class MailService : IMailService
             <p><strong>Toplantı:</strong> {meeting.Name}</p>
             <p><strong>Tarih:</strong> {meeting.StartDate:dd.MM.yyyy HH:mm} - {meeting.EndDate:dd.MM.yyyy HH:mm}</p>";
 
-        await SendEmailAsync(toEmail, subject, body);
+        var fromAddress = meeting.CreatedBy?.Email;
+        await SendEmailAsync(toEmail, subject, body, fromAddress);
     }
 
-    private async Task SendEmailAsync(string toEmail, string subject, string htmlBody)
+    private async Task SendEmailAsync(string toEmail, string subject, string htmlBody, string? fromAddress = null)
     {
+        var host = _configuration["Mail:Host"];
+        if (string.IsNullOrWhiteSpace(host))
+        {
+            _logger.LogWarning("Mail:Host yapilandirilmamis; e-posta gonderimi atlaniyor. To: {To}, Subject: {Subject}", toEmail, subject);
+            return;
+        }
+
         try
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(_configuration["Mail:From"] ?? "noreply@toplanti.app"));
+            var from = !string.IsNullOrWhiteSpace(fromAddress)
+                ? fromAddress
+                : (_configuration["Mail:From"] ?? "noreply@toplanti.app");
+            email.From.Add(MailboxAddress.Parse(from));
             email.To.Add(MailboxAddress.Parse(toEmail));
             email.Subject = subject;
 
             var builder = new BodyBuilder { HtmlBody = htmlBody };
             email.Body = builder.ToMessageBody();
 
-            using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(
-                _configuration["Mail:Host"],
-                int.Parse(_configuration["Mail:Port"] ?? "587"),
-                SecureSocketOptions.StartTls);
+            var port = int.Parse(_configuration["Mail:Port"] ?? "587");
+            var useTls = string.Equals(_configuration["Mail:SecureSocketOptions"], "None", StringComparison.OrdinalIgnoreCase)
+                ? SecureSocketOptions.None
+                : SecureSocketOptions.StartTls;
 
-            await smtp.AuthenticateAsync(
-                _configuration["Mail:Username"],
-                _configuration["Mail:Password"]);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(host, port, useTls);
+
+            var username = _configuration["Mail:Username"];
+            if (!string.IsNullOrWhiteSpace(username))
+            {
+                await smtp.AuthenticateAsync(username, _configuration["Mail:Password"] ?? "");
+            }
 
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
