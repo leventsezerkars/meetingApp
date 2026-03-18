@@ -4,7 +4,7 @@ using ToplantiApp.Infrastructure.Data;
 
 namespace ToplantiApp.Infrastructure.Repositories;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork,IDisposable
 {
     private readonly AppDbContext _context;
     private IDbContextTransaction? _transaction;
